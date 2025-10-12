@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [v0.1.1] - 2025-10-12
-- 
+
 - feat(models): add location fields to `Book` and `books` table schema (room, shelf, row, position)
 
 ## [v0.1.0] - 2025-10-12
