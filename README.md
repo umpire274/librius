@@ -21,8 +21,6 @@ and import/export support.
 
 ## 📦 Installation
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/librius.svg)](https://repology.org/project/librius/versions)
-
 ### 🐧 AUR (Arch Linux)
 
 [![AUR](https://img.shields.io/aur/version/librius)](https://aur.archlinux.org/packages/librius)
