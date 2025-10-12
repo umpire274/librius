@@ -9,7 +9,7 @@ readme = "README.md"
 homepage = "https://github.com/umpire274/librius"
 repository = "https://github.com/umpire274/rbackup"
 keywords = ["books", "library", "cli", "sqlite", "manager"]
-categories = ["command-line-utilities", "database", "data-structures", "productivity", "rust-patterns"]
+categories = ["command-line-utilities", "database", "data-structures", "rust-patterns"]
 exclude = [
     "target/*",
     ".idea/*",
