@@ -14,19 +14,20 @@
 **Librius** is a cross-platform **command-line tool** written in Rust that helps you manage your personal library.  
 It uses a **SQLite** database to store your books and a simple **TOML** configuration file for flexible setup.
 
-This project aims to provide a clean, modular architecture with future extensions such as search, add/remove commands, and import/export support.
+This project aims to provide a clean, modular architecture with future extensions such as search, add/remove commands,
+and import/export support.
 
 ---
 
 ## ⚙️ Features
 
-| Status | Feature | Description |
-|:------:|:---------|:-------------|
-| ✅ | **List** | Display all books stored in the local database |
-| ✅ | **Config auto-init** | Creates default `librius.toml` config file in `~/.config/librius/` |
-| 🚧 | **Add / Remove** | Add or delete books via CLI commands |
-| 🚧 | **Search** | Search by title, author, or ISBN |
-| 🚧 | **Export / Import** | Export and import data (JSON, CSV) |
+| Status | Feature              | Description                                                        |
+|:------:|:---------------------|:-------------------------------------------------------------------|
+|   ✅    | **List**             | Display all books stored in the local database                     |
+|   ✅    | **Config auto-init** | Creates default `librius.toml` config file in `~/.config/librius/` |
+|   🚧   | **Add / Remove**     | Add or delete books via CLI commands                               |
+|   🚧   | **Search**           | Search by title, author, or ISBN                                   |
+|   🚧   | **Export / Import**  | Export and import data (JSON, CSV)                                 |
 
 ---
 
@@ -47,23 +48,26 @@ ibrius/
 └── README.md
 ```
 
-
 ---
 
 ## 🚀 Quick start
 
 ### 1️⃣ Clone the repository
+
 ```bash
 git clone https://github.com/umpire274/librius.git
 cd librius
 ```
 
 ### 2️⃣ Build and run
+
 ```bash
 cargo build
 cargo run -- list
 ```
+
 If this is the first launch, Librius will automatically create:
+
 - The config file at `~/.config/librius/librius.toml`
 - A SQLite database at `~/.config/librius/librius.db`
 
@@ -74,6 +78,7 @@ If this is the first launch, Librius will automatically create:
 $ librius list
 
 📚 Your Library
+
 1. The Hobbit (J.R.R. Tolkien) [1937]
 2. Foundation (Isaac Asimov) [1951]
 3. Dune (Frank Herbert) [1965]
@@ -91,6 +96,7 @@ Windows:
 `%APPDATA%\librius\librius.toml`
 
 Example:
+
 ```bash
 db_path = "/home/alessandro/.config/librius/librius.db"
 ```
@@ -110,16 +116,19 @@ colored — Colored terminal output
 ## 🧪 Development
 
 ### Run in debug mode
+
 ```bash
 cargo run -- list
 ```
 
 ### Run with logging (future)
+
 ```bash
 RUST_LOG=debug cargo run -- add "Neuromancer"
 ```
 
 ### Format and lint
+
 ```bash
 cargo fmt
 cargo clippy
