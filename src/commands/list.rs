@@ -5,9 +5,27 @@
 //! a human-readable list to standard output using colored formatting.
 
 use crate::models::Book;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use colored::*;
 use rusqlite::Connection;
 use std::error::Error;
+
+fn parse_added_at(s: &str) -> Option<DateTime<Utc>> {
+    // Try RFC3339 first
+    if let Ok(dt) = DateTime::parse_from_rfc3339(s) {
+        return Some(dt.with_timezone(&Utc));
+    }
+    // Try SQLite default format: "YYYY-MM-DD HH:MM:SS"
+    if let Ok(naive) = NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S") {
+        return Some(DateTime::from_naive_utc_and_offset(naive, Utc));
+    }
+    // Try with fractional seconds
+    if let Ok(naive) = NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S%.f") {
+        return Some(DateTime::from_naive_utc_and_offset(naive, Utc));
+    }
+
+    None
+}
 
 /// Handle the `list` subcommand.
 ///
@@ -18,6 +36,13 @@ pub fn handle_list(conn: &Connection) -> Result<(), Box<dyn Error>> {
     let mut stmt = conn
         .prepare("SELECT id, title, author, editor, year, isbn, language, pages, genre, summary, added_at FROM books ORDER BY id;")?;
     let rows = stmt.query_map([], |row| {
+        // Read added_at as an optional string, then parse to DateTime<Utc>
+        let added_at_str: Option<String> = row.get("added_at")?;
+        let parsed_added_at = match added_at_str {
+            Some(ref s) => parse_added_at(s),
+            None => None,
+        };
+
         Ok(Book {
             id: row.get("id")?,
             title: row.get("title")?,
@@ -29,7 +54,7 @@ pub fn handle_list(conn: &Connection) -> Result<(), Box<dyn Error>> {
             pages: row.get("pages")?,
             genre: row.get("genre")?,
             summary: row.get("summary")?,
-            added_at: row.get("added_at")?,
+            added_at: parsed_added_at,
         })
     })?;
 
