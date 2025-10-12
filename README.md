@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/umpire274/librius/actions/workflows/ci.yml/badge.svg)](https://github.com/umpire274/librius/actions)
 [![Crates.io](https://img.shields.io/crates/v/librius.svg)](https://crates.io/crates/librius)
+[![Docs.rs](https://docs.rs/librius/badge.svg)](https://docs.rs/librius)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Rust Edition](https://img.shields.io/badge/Rust-2024-orange.svg)](https://www.rust-lang.org/)
 
@@ -103,6 +104,22 @@ db_path = "/home/alessandro/.config/librius/librius.db"
 
 ---
 
+## 📚 Documentation
+
+The API and user-facing documentation for Librius is available on docs.rs:
+
+- Online: https://docs.rs/librius
+
+To generate and view the documentation locally run:
+
+```bash
+cargo doc --no-deps --open
+```
+
+This will build the documentation and open it in your default browser.
+
+---
+
 ## 🧰 Dependencies
 
 clap — Command-line argument parsing
@@ -171,6 +188,4 @@ If you’d like to contribute, please open a pull request or start a discussion.
 If you enjoy this project, please ⭐ star the repository — it helps visibility and development motivation!
 
 ---
-
-
 
