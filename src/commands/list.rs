@@ -17,22 +17,21 @@ use std::error::Error;
 pub fn handle_list(conn: &Connection) -> Result<(), Box<dyn Error>> {
     let mut stmt = conn
         .prepare("SELECT id, title, author, editor, year, isbn, language, pages, genre, summary, added_at FROM books ORDER BY id;")?;
-    let rows = stmt
-        .query_map([], |row| {
-            Ok(Book {
-                id: row.get("id")?,
-                title: row.get("title")?,
-                author: row.get("author")?,
-                editor: row.get("editor")?,
-                year: row.get("year")?,
-                isbn: row.get("isbn")?,
-                language: row.get("language")?,
-                pages: row.get("pages")?,
-                genre: row.get("genre")?,
-                summary: row.get("summary")?,
-                added_at: row.get("added_at")?,
-            })
-        })?;
+    let rows = stmt.query_map([], |row| {
+        Ok(Book {
+            id: row.get("id")?,
+            title: row.get("title")?,
+            author: row.get("author")?,
+            editor: row.get("editor")?,
+            year: row.get("year")?,
+            isbn: row.get("isbn")?,
+            language: row.get("language")?,
+            pages: row.get("pages")?,
+            genre: row.get("genre")?,
+            summary: row.get("summary")?,
+            added_at: row.get("added_at")?,
+        })
+    })?;
 
     println!("\n{}", "📚 Your Library".bold().green());
     for b in rows {

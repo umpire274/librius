@@ -8,8 +8,8 @@
 //! book (title, author, year, isbn and a timestamp when the record was
 //! added).
 
-use rusqlite::{Connection, Result};
 use crate::config::AppConfig;
+use rusqlite::{Connection, Result};
 
 /// Initialize or open the SQLite database and ensure required tables exist.
 ///
@@ -43,9 +43,9 @@ use crate::config::AppConfig;
 /// Returns a `rusqlite::Error` if the database file cannot be opened or the
 /// initialization SQL fails.
 pub fn init_db(cfg: &AppConfig) -> Result<Connection> {
-	let conn = Connection::open(&cfg.db_path)?;
-	conn.execute_batch(
-		"CREATE TABLE IF NOT EXISTS books (
+    let conn = Connection::open(&cfg.db_path)?;
+    conn.execute_batch(
+        "CREATE TABLE IF NOT EXISTS books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             author TEXT,
@@ -58,6 +58,6 @@ pub fn init_db(cfg: &AppConfig) -> Result<Connection> {
 			summary TEXT,
 			added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );",
-	)?;
-	Ok(conn)
+    )?;
+    Ok(conn)
 }
