@@ -20,6 +20,39 @@ and import/export support.
 
 ---
 
+## 📦 Installation
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/librius.svg)](https://repology.org/project/librius/versions)
+
+### 🐧 AUR (Arch Linux)
+
+[![AUR](https://img.shields.io/aur/version/librius)](https://aur.archlinux.org/packages/librius)
+
+```bash
+yay -S librius
+# or
+paru -S librius
+```
+
+### 🍺 Homebrew (macOS/Linux)
+
+[![Homebrew](https://img.shields.io/badge/Homebrew-Librius-orange.svg?logo=homebrew)](https://github.com/umpire274/homebrew-tap)
+
+```bash
+brew tap umpire274/tap
+brew install librius
+```
+
+### 🦀 Crates.io (Rust)
+
+[![Crates.io](https://img.shields.io/crates/v/librius)](https://crates.io/crates/librius)
+
+```bash
+cargo install rtimelogger
+```
+
+---
+
 ## ⚙️ Features
 
 | Status | Feature              | Description                                                        |
