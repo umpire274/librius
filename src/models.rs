@@ -4,6 +4,7 @@
 //! entities stored in the SQLite database. Models are `serde` serializable
 //! so they can be easily printed, logged, or converted to JSON if needed.
 
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 /// Represents a single book record in the library.
@@ -33,7 +34,9 @@ pub struct Book {
     pub genre: Option<String>,
     /// Short textual summary or notes about the book.
     pub summary: Option<String>,
-    /// Timestamp when the record was added. Stored as text from SQLite's
-    /// `CURRENT_TIMESTAMP` default; represented here as an optional string.
-    pub added_at: Option<String>,
+    /// Timestamp when the record was added. Represented as `DateTime<Utc>`.
+    ///
+    /// This field maps the SQLite `CURRENT_TIMESTAMP` value (stored as
+    /// text like `YYYY-MM-DD HH:MM:SS`) into a `chrono::DateTime<Utc>`.
+    pub added_at: Option<DateTime<Utc>>,
 }

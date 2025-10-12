@@ -61,12 +61,20 @@ pub fn handle_list(conn: &Connection) -> Result<(), Box<dyn Error>> {
     println!("\n{}", "📚 Your Library".bold().green());
     for b in rows {
         let b = b?;
+        // Format added_at as YYYY-MM-DD when present
+        let added_date = b
+            .added_at
+            .as_ref()
+            .map(|d| d.format("%Y-%m-%d").to_string())
+            .unwrap_or_else(|| "-".to_string());
+
         println!(
-            "{}. {} ({:?}) [{}]",
+            "{}. {} ({:?}) [{}] [{}]",
             b.id.to_string().blue(),
             b.title.bold(),
             b.author.unwrap_or_else(|| "Unknown".into()),
-            b.year.map_or("-".to_string(), |y| y.to_string())
+            b.year.map_or("-".to_string(), |y| y.to_string()),
+            added_date
         );
     }
 
