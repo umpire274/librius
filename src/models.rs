@@ -11,7 +11,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// Fields correspond to the columns of the `books` table in the SQLite
 /// database. Many fields are optional to reflect incomplete metadata for
-/// some records.
+/// some records. The cataloging/location fields (`room`, `shelf`, `row` and
+/// `position`) describe where the physical item is stored and are optional
+/// because not all records may have precise shelving information.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Book {
     /// Primary key identifier for the book.
@@ -34,6 +36,14 @@ pub struct Book {
     pub genre: Option<String>,
     /// Short textual summary or notes about the book.
     pub summary: Option<String>,
+    /// Room where the item is stored (e.g. "Main", "Annex").
+    pub room: Option<String>,
+    /// Shelf identifier inside the room, when available.
+    pub shelf: Option<String>,
+    /// Row identifier on the shelf, when available.
+    pub row: Option<String>,
+    /// Position within the row/shelf, when available.
+    pub position: Option<String>,
     /// Timestamp when the record was added. Represented as `DateTime<Utc>`.
     ///
     /// This field maps the SQLite `CURRENT_TIMESTAMP` value (stored as

@@ -37,6 +37,10 @@ use rusqlite::{Connection, Result};
 /// - `pages`: INTEGER
 /// - `genre`: TEXT
 /// - `summary`: TEXT
+/// - `room`: TEXT
+/// - `shelf`: TEXT
+/// - `row`: TEXT
+/// - `position`: TEXT
 /// - `added_at`: TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ///
 /// # Errors
@@ -56,6 +60,10 @@ pub fn init_db(cfg: &AppConfig) -> Result<Connection> {
 			pages INTEGER,
 			genre TEXT,
 			summary TEXT,
+            room TEXT,
+            shelf TEXT,
+            row TEXT,
+            position TEXT,
 			added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );",
     )?;

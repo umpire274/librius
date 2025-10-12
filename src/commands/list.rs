@@ -34,7 +34,7 @@ fn parse_added_at(s: &str) -> Option<DateTime<Utc>> {
 /// returned to the caller so the binary can decide how to report them.
 pub fn handle_list(conn: &Connection) -> Result<(), Box<dyn Error>> {
     let mut stmt = conn
-        .prepare("SELECT id, title, author, editor, year, isbn, language, pages, genre, summary, added_at FROM books ORDER BY id;")?;
+        .prepare("SELECT id, title, author, editor, year, isbn, language, pages, genre, summary, room, shelf, row, position, added_at FROM books ORDER BY id;")?;
     let rows = stmt.query_map([], |row| {
         // Read added_at as an optional string, then parse to DateTime<Utc>
         let added_at_str: Option<String> = row.get("added_at")?;
@@ -54,6 +54,10 @@ pub fn handle_list(conn: &Connection) -> Result<(), Box<dyn Error>> {
             pages: row.get("pages")?,
             genre: row.get("genre")?,
             summary: row.get("summary")?,
+            room: row.get("room")?,
+            shelf: row.get("shelf")?,
+            row: row.get("row")?,
+            position: row.get("position")?,
             added_at: parsed_added_at,
         })
     })?;
