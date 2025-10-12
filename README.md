@@ -36,7 +36,7 @@ paru -S librius
 
 ### 🍺 Homebrew (macOS/Linux)
 
-[![Homebrew](https://img.shields.io/badge/Homebrew-Librius-orange.svg?logo=homebrew)](https://github.com/umpire274/homebrew-tap)
+[![Homebrew Version](https://img.shields.io/github/v/release/umpire274/librius?label=Homebrew&logo=homebrew&color=orange)](https://github.com/umpire274/homebrew-tap)
 
 ```bash
 brew tap umpire274/tap
