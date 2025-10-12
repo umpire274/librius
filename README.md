@@ -1,7 +1,6 @@
 # 📚 Librius
 
 [![Build Status](https://github.com/umpire274/librius/actions/workflows/ci.yml/badge.svg)](https://github.com/umpire274/librius/actions)
-[![Crates.io](https://img.shields.io/crates/v/librius.svg)](https://crates.io/crates/librius)
 [![Docs.rs](https://docs.rs/librius/badge.svg)](https://docs.rs/librius)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Rust Edition](https://img.shields.io/badge/Rust-2024-orange.svg)](https://www.rust-lang.org/)
