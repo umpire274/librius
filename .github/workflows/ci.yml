@@ -1,0 +1,237 @@
+name: Build, Package and Release
+
+on:
+  workflow_run:
+    workflows: [ "Rust Build & Test" ]
+    types: [ completed ]
+
+permissions:
+  contents: write
+
+jobs:
+  build_lnx_win:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            ext: tar.gz
+            bin: librius
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            ext: zip
+            bin: librius.exe
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Extract version (Unix/Win)
+        id: ver
+        shell: bash
+        run: |
+          VERSION=$(grep '^version' Cargo.toml | head -n1 | cut -d '"' -f2)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      
+      - name: Cache cargo / target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Install Rust target
+        run: rustup target add ${{ matrix.target }}
+      
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+      
+      - name: Package
+        shell: bash
+        run: |
+          mkdir -p release_artifacts/${{ matrix.target }}
+          cd target/${{ matrix.target }}/release
+          mkdir -p librius-${{ matrix.target }}
+          cp "${{ matrix.bin }}" librius-${{ matrix.target }}/
+          cp $GITHUB_WORKSPACE/{README.md,LICENSE,CHANGELOG.md} librius-${{ matrix.target }}/
+          
+          if [[ "${{ matrix.ext }}" == "zip" ]]; then
+            powershell -Command "Compress-Archive -Path librius-${{ matrix.target }}\\* -DestinationPath librius-${VERSION}-${{ matrix.target }}.zip"
+            cp librius-${VERSION}-${{ matrix.target }}.zip $GITHUB_WORKSPACE/release_artifacts/${{ matrix.target }}/
+          else
+            tar -czf librius-${VERSION}-${{ matrix.target }}.tar.gz librius-${{ matrix.target }}
+            cp librius-${VERSION}-${{ matrix.target }}.tar.gz $GITHUB_WORKSPACE/release_artifacts/${{ matrix.target }}/
+          fi
+      
+      - name: Upload artifact (lnx/win)
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_artifacts-${{ matrix.target }}
+          path: release_artifacts/${{ matrix.target }}
+  
+  build_macos_dual:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: macos-14
+    timeout-minutes: 60
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Extract version
+        id: ver
+        shell: bash
+        run: |
+          VERSION=$(grep '^version' Cargo.toml | head -n1 | cut -d '"' -f2)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      
+      - name: Cache cargo / target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: macos-cargo-dual-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Install Rust targets (x86_64 + aarch64)
+        run: |
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
+      
+      - name: Build x86_64
+        run: cargo build --release --target x86_64-apple-darwin
+      
+      - name: Package x86_64
+        shell: bash
+        run: |
+          mkdir -p release_artifacts/x86_64-apple-darwin
+          cd target/x86_64-apple-darwin/release
+          mkdir -p librius-x86_64-apple-darwin
+          cp librius librius-x86_64-apple-darwin/
+          cp $GITHUB_WORKSPACE/{README.md,LICENSE,CHANGELOG.md} librius-x86_64-apple-darwin/
+          tar -czf librius-${VERSION}-x86_64-apple-darwin.tar.gz librius-x86_64-apple-darwin
+          cp librius-${VERSION}-x86_64-apple-darwin.tar.gz $GITHUB_WORKSPACE/release_artifacts/x86_64-apple-darwin/
+      
+      - name: Build aarch64
+        run: cargo build --release --target aarch64-apple-darwin
+      
+      - name: Package aarch64
+        shell: bash
+        run: |
+          mkdir -p release_artifacts/aarch64-apple-darwin
+          cd target/aarch64-apple-darwin/release
+          mkdir -p librius-aarch64-apple-darwin
+          cp librius librius-aarch64-apple-darwin/
+          cp $GITHUB_WORKSPACE/{README.md,LICENSE,CHANGELOG.md} librius-aarch64-apple-darwin/
+          tar -czf librius-${VERSION}-aarch64-apple-darwin.tar.gz librius-aarch64-apple-darwin
+          cp librius-${VERSION}-aarch64-apple-darwin.tar.gz $GITHUB_WORKSPACE/release_artifacts/aarch64-apple-darwin/
+      
+      - name: Upload artifacts (macOS)
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_artifacts-macos
+          path: |
+            release_artifacts/x86_64-apple-darwin
+            release_artifacts/aarch64-apple-darwin
+  
+  consolidate:
+    name: Consolidate Artifacts
+    needs: [ build_lnx_win, build_macos_dual ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release_artifacts-*
+          path: temp_download
+          merge-multiple: true
+      
+      - name: Combine into single folder
+        shell: bash
+        run: |
+          mkdir -p release_artifacts
+          find temp_download -type f -exec cp {} release_artifacts/ \;
+      
+      - name: Upload consolidated
+        uses: actions/upload-artifact@v4
+        with:
+          name: release_artifacts
+          path: release_artifacts
+  
+  release:
+    name: Create GitHub Release (sign on Linux)
+    needs: consolidate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (for Cargo.toml/CHANGELOG)
+        uses: actions/checkout@v4
+      
+      - name: Download consolidated
+        uses: actions/download-artifact@v4
+        with:
+          name: release_artifacts
+          path: release_artifacts
+      
+      - name: Extract version
+        id: extract_version
+        run: |
+          VERSION=$(grep '^version' Cargo.toml | head -n1 | cut -d '"' -f2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      
+      - name: Generate SHA256 for all files
+        shell: bash
+        run: |
+          cd release_artifacts
+          # genera un file SHA256 per ogni artefatto singolarmente:
+          for f in librius-*.*; do
+            [[ -f "$f" ]] || continue
+            sha256sum "$f" > "$f.sha256" || shasum -a 256 "$f" > "$f.sha256"
+          done
+      
+      - name: Import GPG key
+        shell: bash
+        run: |
+          mkdir -p ~/.gnupg && chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          gpgconf --kill gpg-agent
+          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      
+      - name: Sign all artifacts (detach .sig)
+        shell: bash
+        run: |
+          cd release_artifacts
+          for f in librius-*.*; do
+            [[ -f "$f" ]] || continue
+            gpg --batch --yes --pinentry-mode loopback \
+                --passphrase "$GPG_PASSPHRASE" \
+                --output "$f.sig" --detach-sign "$f"
+          done
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.extract_version.outputs.version }}
+          name: "v${{ steps.extract_version.outputs.version }}"
+          body_path: CHANGELOG.md
+          files: |
+            release_artifacts/librius-*.tar.gz
+            release_artifacts/librius-*.zip
+            release_artifacts/librius-*.sig
+            release_artifacts/librius-*.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
