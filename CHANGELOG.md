@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.2.1] - 2025-10-13
+
+### Added
+
+- **Database migrations**: introduced `db/migrate.rs` with incremental patch system and automatic execution at startup.
+- **Configuration migrations**: added `config/migrate.rs` to automatically upgrade YAML configuration files.
+- **Logging system**: new `utils::write_log()` function records database and migration events into the `log` table.
+- **Verbose mode**: added global `--verbose` flag for diagnostic and debug output.
+    - Normal mode: silent operation, only command results shown.
+    - Verbose mode: shows configuration loading, database opening, and migration messages.
+- **`db::start_db()`**: unified entry point that handles opening, creating, and migrating the database automatically.
+- **Timestamp utility**: new `utils::now_str()` returns ISO 8601 formatted timestamps (`%+`).
+
+### Changed
+
+- Initialization messages are now hidden in normal mode.
+- `main.rs` simplified: initialization logic moved into `db::start_db()`.
+- `print_info()` and `print_ok()` now depend on verbose mode.
+
+### Fixed
+
+- Prevented redundant database initialization messages on repeated launches.
+- Ensured migrations and configuration updates are idempotent and silent if up-to-date.
+
+---
+
 ## [v0.2.0] - 2025-10-13
 
 - feat(cli): add `config` command with `--print`, `--init`, `--edit`, and `--editor` options

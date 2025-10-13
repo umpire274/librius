@@ -57,6 +57,9 @@ cargo install rtimelogger
 |:------:|:----------------------|:----------------------------------------------------------------------------|
 |   ✅    | **List**              | Display all books stored in the local database                              |
 |   ✅    | **Config management** | Manage YAML config via `config --print`, `--init`, `--edit`, and `--editor` |
+|   ✅	   | Database migrations   | 	Automatic schema upgrades at startup                                       |
+|   ✅	   | Logging system	       | Records operations and migrations in log table                              |
+|   ✅	   | Verbose mode	         | Optional --verbose flag for detailed debug output                           |
 |   🚧   | **Add / Remove**      | Add or delete books via CLI commands                                        |
 |   🚧   | **Search**            | Search by title, author, or ISBN                                            |
 |   🚧   | **Export / Import**   | Export and import data (JSON, CSV)                                          |
@@ -119,21 +122,17 @@ $ librius list
 
 ## ⚙️ Configuration
 
-The default configuration file is stored at:
-
-The default configuration file is stored at:
-
-Linux/macOS:  
-`$HOME/.librius/librius.conf`
-
-Windows:  
-`%APPDATA%\Roaming\librius\librius.conf`
-
-Example (YAML):
-
 ```yaml
-db_path: "C:/Users/alessandro/.librius/librius.db"
+# librius.conf
+database: "C:/Users/YourName/AppData/Roaming/librius/librius.db"
+language_default: "English"
+theme: "light"
 ```
+
+- Configuration file is automatically migrated if fields are missing or renamed.
+- Default path:
+    - macOS/Linux → $HOME/.librius/librius.conf
+    - Windows → %APPDATA%\Roaming\librius\librius.conf
 
 ---
 
@@ -160,6 +159,44 @@ rusqlite — SQLite database
 serde — Serialization/deserialization
 toml — Config format support
 colored — Colored terminal output
+
+---
+
+## 🗄️ Database management
+
+Librius automatically checks and upgrades the SQLite database structure at startup.
+
+- On first launch → creates books table.
+- On subsequent launches → runs pending migrations silently.
+- Migration results are recorded in the log table.
+
+### Example table `log`
+
+|id |date| operation |target |message|
+|:------:|:----------------------|:----------------------------------------------------------------------------|
+|1 |2025-10-13T21:45:12+02:00| DB_CREATED |DB| Created new database|
+|2 |2025-10-13T21:45:13+02:00| DB_MIGRATION_OK| DB| Schema updated successfully|
+
+---
+
+🔍 Verbose mode
+
+Run Librius in diagnostic mode to display all internal initialization steps:
+```bash
+librius --verbose list
+```
+
+Output example:
+```bash
+📘  Loading configuration...
+📘  Opening existing database at: C:\Users\A.Maestri\AppData\Roaming\librius\librius.db
+✅ Database schema is up-to-date.
+✅ Configuration verified.
+
+📚 Your Library
+```
+
+In normal mode, only command output is displayed.
 
 ---
 
