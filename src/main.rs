@@ -14,26 +14,44 @@
 //! ```
 
 use clap::Parser;
-use librius::cli::Cli;
-use librius::cli::run_cli;
+use librius::cli::{Cli, run_cli};
+use librius::config;
+use librius::db;
+use librius::utils::icons::ERR;
+use librius::utils::{is_verbose, print_err, print_info, print_ok, set_verbose};
 
-/// Application entry point.
-///
-/// The `main` function performs the following steps:
-/// 1. Parse command line arguments.
-/// 2. Load or initialize the YAML configuration file.
-/// 3. Initialize the SQLite database connection.
-/// 4. Dispatch the requested subcommand (currently only `list`).
-///
-/// Errors during configuration loading or database initialization will cause
-/// the program to terminate with a short error message. Command handlers
-/// return `Result` and are handled here to provide a consistent exit code.
 fn main() {
     let cli = Cli::parse();
+    set_verbose(cli.verbose);
 
-    // Inizializza DB e config
-    let config = librius::config::load_or_init().expect("Unable to load config");
-    let conn = librius::db::init_db(&config).expect("Unable to initialize database");
+    // ------------------------------------------------------------
+    // 1️⃣ Load or initialize configuration file
+    // ------------------------------------------------------------
+    print_info("Loading configuration...", is_verbose());
+    let config = config::load_or_init().unwrap_or_else(|_| panic!("{}Unable to load config", ERR));
 
+    // ------------------------------------------------------------
+    // 2️⃣ Initialize or open the database (delegated to start_db)
+    // ------------------------------------------------------------
+    let conn = db::start_db(&config).unwrap_or_else(|_| panic!("{}Unable to start database", ERR));
+
+    // ---------------------------------------------------------------------
+    // 3️⃣ Run DB migrations (applies missing patches) and config migrations
+    // ---------------------------------------------------------------------
+    if let Err(e) = db::migrate::run_migrations(&conn) {
+        print_err(&format!("Database migration failed: {}", e));
+    } else {
+        print_ok("Database schema is up-to-date.", is_verbose());
+    }
+    // Apply config migrations if needed
+    if let Err(e) = config::migrate::migrate_config(&conn, &config::config_file_path()) {
+        print_err(&format!("Config migration failed: {}", e));
+    } else {
+        print_ok("Configuration verified.", is_verbose());
+    }
+
+    // ------------------------------------------------------------
+    // 4️⃣ Execute CLI command
+    // ------------------------------------------------------------
     let _ = run_cli(cli, &conn);
 }

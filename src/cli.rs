@@ -15,6 +15,11 @@ use rusqlite::Connection;
     about = "Manage your personal book collection easily"
 )]
 pub struct Cli {
+    /// Enable verbose output (debug mode)
+    #[arg(short, long, global = true)]
+    pub verbose: bool,
+
+    /// The command to execute
     #[command(subcommand)]
     pub command: Commands,
 }

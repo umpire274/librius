@@ -9,6 +9,8 @@
 //! deterministic configuration directory and to persist a default
 //! configuration when none exists.
 
+pub mod migrate;
+
 use serde::{Deserialize, Serialize};
 use std::io::Write;
 use std::{env, fs, path::PathBuf};
@@ -19,18 +21,18 @@ use std::{env, fs, path::PathBuf};
 /// simple YAML file placed inside the per-user configuration directory.
 ///
 /// Fields:
-/// - `db_path`: filesystem path to the SQLite database used by Librius.
+/// - `database`: filesystem path to the SQLite database used by Librius.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AppConfig {
     /// Path to the local SQLite database
-    pub db_path: String,
+    pub database: String,
 }
 
 impl Default for AppConfig {
     fn default() -> Self {
-        let db_path = default_db_path();
+        let database = default_db_path();
         Self {
-            db_path: db_path.to_string_lossy().to_string(),
+            database: database.to_string_lossy().to_string(),
         }
     }
 }
@@ -45,7 +47,6 @@ fn config_dir() -> PathBuf {
     if cfg!(target_os = "windows") {
         if let Ok(appdata) = env::var("APPDATA") {
             let mut path = PathBuf::from(appdata);
-            path.push("Roaming");
             path.push("librius");
             return path;
         }
@@ -74,7 +75,7 @@ fn default_db_path() -> PathBuf {
 /// The returned path points to `librius.conf` inside the configuration
 /// directory. The function also attempts to create the directory if it does
 /// not already exist.
-pub(crate) fn config_file_path() -> PathBuf {
+pub fn config_file_path() -> PathBuf {
     let mut path = config_dir();
     fs::create_dir_all(&path).ok();
     path.push("librius.conf");
@@ -96,7 +97,7 @@ pub(crate) fn config_file_path() -> PathBuf {
 /// use librius::config::AppConfig;
 /// // This will create a default config file in the user's config dir if missing
 /// let cfg: AppConfig = librius::config::load_or_init().expect("load config");
-/// println!("db path: {}", cfg.db_path);
+/// println!("database: {}", cfg.database);
 /// ```
 pub fn load_or_init() -> Result<AppConfig, Box<dyn std::error::Error>> {
     let config_path = config_file_path();

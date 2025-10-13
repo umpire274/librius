@@ -45,10 +45,10 @@ mod tests {
             "CREATE TABLE books (
                 id INTEGER PRIMARY KEY,
                 title TEXT NOT NULL,
-                author TEXT,
-                editor TEXT,
-                year INTEGER,
-                isbn TEXT,
+                author TEXT NOT NULL,
+                editor TEXT NOT NULL,
+                year INTEGER NOT NULL,
+                isbn TEXT NOT NULL,
                 language TEXT,
                 pages INTEGER,
                 genre TEXT,
@@ -57,7 +57,7 @@ mod tests {
                 shelf TEXT,
                 row TEXT,
                 position TEXT,
-                added_at TEXT
+                added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );",
             [],
         )?;

@@ -8,64 +8,117 @@
 //! book (title, author, year, isbn and a timestamp when the record was
 //! added).
 
-use crate::config::AppConfig;
-use rusqlite::{Connection, Result};
+pub mod migrate;
 
-/// Initialize or open the SQLite database and ensure required tables exist.
+use crate::config::AppConfig;
+use crate::utils::{is_verbose, print_err, print_info, print_ok, write_log};
+use rusqlite::{Connection, Result};
+use std::path::Path;
+
+/// Opens or initializes the SQLite database.
 ///
-/// This function will open the SQLite file pointed by `cfg.db_path` and
-/// execute a `CREATE TABLE IF NOT EXISTS` statement to ensure the `books`
-/// table is available. On success it returns an active `Connection` that
-/// callers can use for queries and commands.
+/// - If the database file does not exist, it creates a new one and its tables.
+/// - If it exists, it just opens it and applies pending migrations.
+/// - Each operation is logged in the `log` table.
 ///
-/// # Example
-/// ```no_run
-/// use librius::config::AppConfig;
-/// // load or create config and then initialize the database
-/// let cfg: AppConfig = librius::config::load_or_init().unwrap();
-/// let conn = librius::db::init_db(&cfg).unwrap();
-/// ```
-///
-/// # Schema (summary)
-/// - `id`: INTEGER PRIMARY KEY AUTOINCREMENT
-/// - `title`: TEXT NOT NULL
-/// - `author`: TEXT
-/// - `editor`: TEXT
-/// - `year`: INTEGER
-/// - `isbn`: TEXT
-/// - `language`: TEXT
-/// - `pages`: INTEGER
-/// - `genre`: TEXT
-/// - `summary`: TEXT
-/// - `room`: TEXT
-/// - `shelf`: TEXT
-/// - `row`: TEXT
-/// - `position`: TEXT
-/// - `added_at`: TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-///
-/// # Errors
-/// Returns a `rusqlite::Error` if the database file cannot be opened or the
-/// initialization SQL fails.
-pub fn init_db(cfg: &AppConfig) -> Result<Connection> {
-    let conn = Connection::open(&cfg.db_path)?;
+pub fn start_db(config: &AppConfig) -> Result<Connection> {
+    let db_path = Path::new(&config.database);
+    let db_exists = db_path.exists();
+
+    if db_exists {
+        print_info(
+            &format!("Opening existing database at: {}", db_path.display()),
+            is_verbose(),
+        );
+    } else {
+        print_info(
+            &format!(
+                "Database not found, creating new one at: {}",
+                db_path.display()
+            ),
+            is_verbose(),
+        );
+    }
+
+    // Try to open connection
+    let conn = Connection::open(db_path)?;
+
+    // Create log table immediately (for logging)
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            operation TEXT NOT NULL,
+            target TEXT DEFAULT '',
+            message TEXT NOT NULL
+        );",
+        [],
+    )?;
+
+    // Log opening
+    let action = if db_exists { "DB_OPENED" } else { "DB_CREATED" };
+    let msg = if db_exists {
+        format!("Opened database '{}'", db_path.display())
+    } else {
+        format!("Created new database '{}'", db_path.display())
+    };
+    let _ = write_log(&conn, action, "DB", &msg);
+
+    // Initialize structure if missing
+    if !db_exists {
+        print_info("Initializing new database structure...", is_verbose());
+        if let Err(e) = ensure_schema(&conn) {
+            print_err(&format!("Database initialization failed: {}", e));
+            let _ = write_log(&conn, "DB_INIT_FAIL", "DB", &e.to_string());
+            return Err(e);
+        }
+        print_ok("Database created successfully.", is_verbose());
+        let _ = write_log(&conn, "DB_INIT_OK", "DB", "Initial database schema created");
+    }
+
+    // Apply migrations
+    if let Err(e) = migrate::run_migrations(&conn) {
+        print_err(&format!("Database migration failed: {}", e));
+        let _ = write_log(&conn, "DB_MIGRATION_FAIL", "DB", &e.to_string());
+    } else {
+        print_ok("Database schema is up-to-date.", is_verbose());
+        let _ = write_log(
+            &conn,
+            "DB_MIGRATION_OK",
+            "DB",
+            "All migrations applied successfully",
+        );
+    }
+
+    Ok(conn)
+}
+
+/// Public compatibility function expected by docs and external callers.
+/// Previous API used `db::init_db(&cfg)` returning a `Connection`.
+pub fn init_db(config: &AppConfig) -> Result<Connection> {
+    start_db(config)
+}
+
+/// Ensure required tables exist in an opened connection.
+pub fn ensure_schema(conn: &Connection) -> Result<()> {
     conn.execute_batch(
         "CREATE TABLE IF NOT EXISTS books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
-            author TEXT,
-			editor TEXT,
-            year INTEGER,
-            isbn TEXT,
-			language TEXT,
-			pages INTEGER,
-			genre TEXT,
-			summary TEXT,
+            author TEXT NOT NULL,
+            editor TEXT NOT NULL,
+            year INTEGER NOT NULL,
+            isbn TEXT NOT NULL,
+            language TEXT,
+            pages INTEGER,
+            genre TEXT,
+            summary TEXT,
             room TEXT,
             shelf TEXT,
             row TEXT,
             position TEXT,
-			added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    		added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );",
     )?;
-    Ok(conn)
+    Ok(())
 }
