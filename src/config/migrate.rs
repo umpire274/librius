@@ -23,7 +23,7 @@ pub fn migrate_config(conn: &Connection, conf_path: &Path) -> io::Result<()> {
     };
 
     // Add missing keys with defaults
-    let migrated = insert_if_missing(map, "language_default", "English");
+    let migrated = insert_if_missing(map, "language", "en");
     //insert_if_missing(map, "theme", "light");
 
     let updated =
