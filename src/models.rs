@@ -21,13 +21,13 @@ pub struct Book {
     /// Title of the book (required).
     pub title: String,
     /// Author name, when available.
-    pub author: Option<String>,
+    pub author: String,
     /// Editor / publisher, when available.
-    pub editor: Option<String>,
+    pub editor: String,
     /// Publication year, when available.
-    pub year: Option<i32>,
+    pub year: i32,
     /// ISBN code, when available.
-    pub isbn: Option<String>,
+    pub isbn: String,
     /// Language of the book (e.g., "en", "it"), when available.
     pub language: Option<String>,
     /// Number of pages, when available.

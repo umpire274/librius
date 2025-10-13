@@ -76,8 +76,8 @@ pub fn handle_list(conn: &Connection) -> Result<(), Box<dyn Error>> {
             "{}. {} ({:?}) [{}] [{}]",
             b.id.to_string().blue(),
             b.title.bold(),
-            b.author.unwrap_or_else(|| "Unknown".into()),
-            b.year.map_or("-".to_string(), |y| y.to_string()),
+            b.author,
+            b.year,
             added_date
         );
     }

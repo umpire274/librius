@@ -63,8 +63,8 @@ mod tests {
         )?;
 
         conn.execute(
-            "INSERT INTO books (title, author, added_at) VALUES (?1, ?2, ?3)",
-            ["Test Book", "Author", "2020-01-01 12:00:00"],
+            "INSERT INTO books (title, author, editor, year, isbn, added_at) VALUES (?1, ?2, ?3,?4, ?5, ?6);",
+            ["Test Book", "Author", "Editor", "2025", "978-88823145698", "2020-01-01 12:00:00"],
         )?;
 
         // Chiama la funzione handle_list per esercitare la logica di mapping e formattazione
