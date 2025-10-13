@@ -74,7 +74,7 @@ fn default_db_path() -> PathBuf {
 /// The returned path points to `librius.conf` inside the configuration
 /// directory. The function also attempts to create the directory if it does
 /// not already exist.
-fn config_file_path() -> PathBuf {
+pub(crate) fn config_file_path() -> PathBuf {
     let mut path = config_dir();
     fs::create_dir_all(&path).ok();
     path.push("librius.conf");

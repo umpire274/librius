@@ -12,7 +12,8 @@
 ## 🧾 Overview
 
 **Librius** is a cross-platform **command-line tool** written in Rust that helps you manage your personal library.  
-It uses a **SQLite** database to store your books and a simple **TOML** configuration file for flexible setup.
+It uses a **SQLite** database to store your books and a simple **YAML** configuration file
+(`librius.conf`) for flexible setup.
 
 This project aims to provide a clean, modular architecture with future extensions such as search, add/remove commands,
 and import/export support.
@@ -52,13 +53,13 @@ cargo install rtimelogger
 
 ## ⚙️ Features
 
-| Status | Feature              | Description                                                        |
-|:------:|:---------------------|:-------------------------------------------------------------------|
-|   ✅    | **List**             | Display all books stored in the local database                     |
-|   ✅    | **Config auto-init** | Creates default `librius.toml` config file in `~/.config/librius/` |
-|   🚧   | **Add / Remove**     | Add or delete books via CLI commands                               |
-|   🚧   | **Search**           | Search by title, author, or ISBN                                   |
-|   🚧   | **Export / Import**  | Export and import data (JSON, CSV)                                 |
+| Status | Feature               | Description                                                                 |
+|:------:|:----------------------|:----------------------------------------------------------------------------|
+|   ✅    | **List**              | Display all books stored in the local database                              |
+|   ✅    | **Config management** | Manage YAML config via `config --print`, `--init`, `--edit`, and `--editor` |
+|   🚧   | **Add / Remove**      | Add or delete books via CLI commands                                        |
+|   🚧   | **Search**            | Search by title, author, or ISBN                                            |
+|   🚧   | **Export / Import**   | Export and import data (JSON, CSV)                                          |
 
 ---
 
@@ -120,16 +121,18 @@ $ librius list
 
 The default configuration file is stored at:
 
-Linux/macOS:
-`~/.config/librius/librius.toml`
+The default configuration file is stored at:
 
-Windows:
-`%APPDATA%\librius\librius.toml`
+Linux/macOS:  
+`$HOME/.librius/librius.conf`
 
-Example:
+Windows:  
+`%APPDATA%\Roaming\librius\librius.conf`
 
-```bash
-db_path = "/home/alessandro/.config/librius/librius.db"
+Example (YAML):
+
+```yaml
+db_path: "C:/Users/alessandro/.librius/librius.db"
 ```
 
 ---
