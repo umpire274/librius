@@ -99,7 +99,7 @@ fn patch_002_add_extra_fields(conn: &Connection) -> Result<()> {
 
     // Fetch existing column names
     let mut stmt = conn.prepare("PRAGMA table_info(books);")?;
-    let column_iter = stmt.query_map([], |row| Ok(row.get::<_, String>(1)?))?;
+    let column_iter = stmt.query_map([], |row| row.get::<_, String>(1))?;
 
     let mut existing_cols = Vec::new();
     for name in column_iter.flatten() {
