@@ -1,4 +1,4 @@
-use crate::commands::list::handle_list;
+use crate::commands::{config::handle_config, list::handle_list};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use rusqlite::Connection;
@@ -16,7 +16,7 @@ use rusqlite::Connection;
 )]
 pub struct Cli {
     #[command(subcommand)]
-    pub command: Option<Commands>,
+    pub command: Commands,
 }
 
 /// Supported top-level commands for the CLI.
@@ -24,19 +24,43 @@ pub struct Cli {
 pub enum Commands {
     /// List all books in your library
     List,
+    /// Manage Librius configuration
+    Config {
+        /// Initialize a new default configuration file
+        #[arg(long, help = "Initialize a new default configuration file")]
+        init: bool,
+
+        /// Print the current configuration file to stdout
+        #[arg(long = "print", help = "Print the current configuration file")]
+        print: bool,
+
+        /// Edit the configuration file with your preferred editor
+        #[arg(
+            long = "edit",
+            help = "Edit the configuration file (default editor: $EDITOR, or nano/vim/notepad)"
+        )]
+        edit: bool,
+
+        /// Specify the editor to use (overrides $EDITOR/$VISUAL).
+        /// Common choices: vim, nano.
+        #[arg(
+            long = "editor",
+            requires = "edit",
+            help = "Specify the editor to use (vim, nano, or custom path)"
+        )]
+        editor: Option<String>,
+    },
 }
 
 /// Esegui il comando scelto
-pub fn run_cli(cli: Cli, conn: &Connection) {
+pub fn run_cli(cli: Cli, conn: &Connection) -> Result<(), Box<dyn std::error::Error>> {
     match cli.command {
-        Some(Commands::List) => {
-            if let Err(e) = handle_list(conn) {
-                eprintln!("{}: {}", "Error".red(), e);
-                std::process::exit(1);
-            }
+        Commands::List => {
+            handle_list(conn).unwrap_or_else(|e| {
+                eprintln!("{} {}", "Error listing books:".red(), e);
+            });
+            Ok(())
         }
-        None => {
-            eprintln!("{}", "No command provided. Try --help.".yellow());
-        }
+        Commands::Config { .. } => Ok(handle_config(&cli.command)?),
     }
 }

@@ -35,5 +35,5 @@ fn main() {
     let config = librius::config::load_or_init().expect("Unable to load config");
     let conn = librius::db::init_db(&config).expect("Unable to initialize database");
 
-    run_cli(cli, &conn);
+    let _ = run_cli(cli, &conn);
 }

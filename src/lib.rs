@@ -24,6 +24,7 @@ pub mod commands;
 pub mod config;
 pub mod db;
 pub mod models;
+pub mod utils;
 
 pub use commands::list::handle_list;
 pub use config::AppConfig;
