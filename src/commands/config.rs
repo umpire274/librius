@@ -87,7 +87,7 @@ pub fn handle_config(cmd: &Commands) -> rusqlite::Result<()> {
             let editor_to_use = requested_editor.unwrap_or_else(|| default_editor.clone());
             let editor_path = Path::new(&editor_to_use);
 
-            let status = Command::new(&editor_path).arg(&config_path).status();
+            let status = Command::new(editor_path).arg(&config_path).status();
             match status {
                 Ok(s) if s.success() => {
                     println!(
