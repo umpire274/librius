@@ -77,17 +77,21 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
     }
 
     // Apply migrations
-    if let Err(e) = migrate::run_migrations(&conn) {
-        print_err(&format!("Database migration failed: {}", e));
-        let _ = write_log(&conn, "DB_MIGRATION_FAIL", "DB", &e.to_string());
-    } else {
-        print_ok("Database schema is up-to-date.", is_verbose());
-        let _ = write_log(
-            &conn,
-            "DB_MIGRATION_OK",
-            "DB",
-            "All migrations applied successfully",
-        );
+    match migrate::run_migrations(&conn) {
+        Err(e) => {
+            print_err(&format!("Database migration failed: {}", e));
+            let _ = write_log(&conn, "DB_MIGRATION_FAIL", "DB", &e.to_string());
+        }
+        Ok(result) => match result {
+            migrate::MigrationResult::Applied(patches) => {
+                print_ok("Database migrations applied successfully.", is_verbose());
+                let msg = format!("Applied patches: {}", patches.join(", "));
+                let _ = write_log(&conn, "DB_MIGRATION_OK", "DB", &msg);
+            }
+            migrate::MigrationResult::None => {
+                print_ok("Database schema is already up-to-date.", is_verbose());
+            }
+        },
     }
 
     Ok(conn)

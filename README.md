@@ -60,28 +60,11 @@ cargo install rtimelogger
 |   ✅	   | Database migrations   | 	Automatic schema upgrades at startup                                       |
 |   ✅	   | Logging system	       | Records operations and migrations in log table                              |
 |   ✅	   | Verbose mode	         | Optional --verbose flag for detailed debug output                           |
+|   ✅	   | Database migrations   | 	Automatic schema updates at startup with detailed logging                  |
+|   ✅	   | Safe patch system     | 	Each migration is idempotent and logged for traceability                   |
 |   🚧   | **Add / Remove**      | Add or delete books via CLI commands                                        |
 |   🚧   | **Search**            | Search by title, author, or ISBN                                            |
 |   🚧   | **Export / Import**   | Export and import data (JSON, CSV)                                          |
-
----
-
-## 🏗️ Architecture
-
-```sh
-ibrius/
-├── Cargo.toml
-├── src/
-│ ├── main.rs # CLI entry point
-│ ├── config.rs # Configuration management
-│ ├── db.rs # SQLite initialization
-│ ├── models.rs # Data models (Book, etc.)
-│ └── commands/
-│ └── list.rs # 'list' command logic
-├── config/
-│ └── librius.toml # Default config file
-└── README.md
-```
 
 ---
 
@@ -104,7 +87,7 @@ cargo run -- list
 If this is the first launch, Librius will automatically create:
 
 - The config file at `~/.config/librius/librius.toml`
-- A SQLite database at `~/.config/librius/librius.db`
+- A SQLite database at `~/.config/librius/librius.sqlite`
 
 ---
 
@@ -125,8 +108,7 @@ $ librius list
 ```yaml
 # librius.conf
 database: "C:/Users/YourName/AppData/Roaming/librius/librius.db"
-language_default: "English"
-theme: "light"
+language: "English"
 ```
 
 - Configuration file is automatically migrated if fields are missing or renamed.
@@ -164,29 +146,40 @@ colored — Colored terminal output
 
 ## 🗄️ Database management
 
-Librius automatically checks and upgrades the SQLite database structure at startup.
+Librius automatically verifies and upgrades the SQLite database schema at startup.
 
 - On first launch → creates books table.
 - On subsequent launches → runs pending migrations silently.
 - Migration results are recorded in the log table.
 
+Each migration patch (`PATCH_001`, `PATCH_002`, …) is applied once and recorded in the internal log table.
+The process is fully idempotent — no duplicate operations are ever performed.
+
+```pgsql
+📘  Applying database patch: PATCH_002
+✅  All pending migrations applied.
+✅  Database schema is up-to-date.
+```
+
 ### Example table `log`
 
-|id |date| operation |target |message|
-|:------:|:----------------------|:----------------------------------------------------------------------------|
-|1 |2025-10-13T21:45:12+02:00| DB_CREATED |DB| Created new database|
-|2 |2025-10-13T21:45:13+02:00| DB_MIGRATION_OK| DB| Schema updated successfully|
+| id | date                      | operation       | target | message                     |
+|----|---------------------------|-----------------|--------|-----------------------------|
+| 1  | 2025-10-13T21:45:12+02:00 | DB_CREATED      | DB     | Created new database        |
+| 2  | 2025-10-13T21:45:13+02:00 | DB_MIGRATION_OK | DB     | Schema updated successfully |
 
 ---
 
 🔍 Verbose mode
 
 Run Librius in diagnostic mode to display all internal initialization steps:
+
 ```bash
 librius --verbose list
 ```
 
 Output example:
+
 ```bash
 📘  Loading configuration...
 📘  Opening existing database at: C:\Users\A.Maestri\AppData\Roaming\librius\librius.db

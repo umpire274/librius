@@ -62,11 +62,11 @@ fn config_dir() -> PathBuf {
 /// Construct the default path for the SQLite database file.
 ///
 /// The function ensures the configuration directory exists and returns the
-/// full path to `librius.db` inside it.
+/// full path to `librius.sqlite` inside it.
 fn default_db_path() -> PathBuf {
     let mut path = config_dir();
     fs::create_dir_all(&path).ok();
-    path.push("librius.db");
+    path.push("librius.sqlite");
     path
 }
 

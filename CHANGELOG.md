@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.2.2] - 2025-10-14
+
+### Added
+
+- **Structured database migration system**
+    - Introduced `MigrationResult` enum replacing the previous boolean return value.
+    - `run_migrations()` now returns explicit results (`Applied([...])` or `None`).
+    - Each applied patch is now logged in the database with detailed information.
+- **Patch safety improvements**
+    - `PATCH_002` now checks for the existence of columns (`language`, `pages`, `genre`, `summary`) before adding them.
+    - Prevents duplicate column errors on repeated runs.
+- **Enhanced migration logging**
+    - Migrations now record results under `DB_MIGRATION_OK`, `DB_MIGRATION_FAIL`, and `MIGRATIONS_COMPLETED` events in
+      the `log` table.
+    - Clear distinction between actual migrations and up-to-date states.
+
+### Changed
+
+- Refactored `run_migrations()` logic for clarity and maintainability.
+- Updated database initialization flow (`start_db()`) to react dynamically to migration results.
+- Improved internal output messages for migrations and startup consistency.
+
+### Fixed
+
+- Ensured safe re-execution of migration patches on existing databases.
+- Removed redundant success messages when no migrations were needed.
+- Unified patch logging behavior across all modules.
+
+---
+
 ## [v0.2.1] - 2025-10-13
 
 ### Added
