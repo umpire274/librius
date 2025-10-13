@@ -85,7 +85,7 @@ pub fn handle_config(cmd: &Commands) -> rusqlite::Result<()> {
 
             // Use the requested editor if available, otherwise fall back
             let editor_to_use = requested_editor.unwrap_or_else(|| default_editor.clone());
-            let editor_path=Path::new(&editor_to_use);
+            let editor_path = Path::new(&editor_to_use);
 
             let status = Command::new(&editor_path).arg(&config_path).status();
             match status {
