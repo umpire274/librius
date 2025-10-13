@@ -107,7 +107,8 @@ pub fn handle_config(cmd: &Commands) -> rusqlite::Result<()> {
                         ERR,
                         format!(
                             "Editor '{}' not available, falling back to '{}'",
-                            editor_path.display(), default_editor
+                            editor_path.display(),
+                            default_editor
                         )
                         .red()
                     );
