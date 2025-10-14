@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.2.3] - 2025-10-14
+
+### Added
+- **Multilanguage support (i18n)**:
+  - Added `i18n` module with `load_language()` and `tr()` functions.
+  - Introduced translation files under `src/i18n/locales/` (`en.json`, `it.json`).
+  - Added `src/i18n/locales/README.md` with key naming conventions.
+  - CLI option `--lang` (or `-l`) allows overriding the language from configuration.
+  - Config file can define a `language:` field for persistent preference.
+  - Added `tr_with()` utility for runtime placeholder substitution (e.g., `{path}`, `{title}`).
+- **Fallback system**: if a translation key is missing or the language file is unavailable, English (`en.json`) is used automatically.
+- **Python helper script** (`scripts/extract_translations.py`):
+  - Scans Rust source files for user-facing strings.
+  - Updates `en.json` with any missing entries without overwriting existing ones.
+
+### Changed
+- All user-facing messages (`print_info`, `print_ok`, `print_err`, `println!`, etc.) are now translatable.
+- Main startup sequence (`main.rs`) loads the selected language before configuration and database initialization.
+
+### Improved
+- Added helper in `config.rs` to read language preference directly from `librius.conf`.
+- Enhanced verbosity filtering to respect localized messages.
+- Clearer structure for future locale additions (fr, es, de, ...).
+
+---
+
 ## [v0.2.2] - 2025-10-14
 
 ### Added

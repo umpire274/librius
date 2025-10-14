@@ -1,0 +1,9 @@
+{
+  "app.init.language": "Inizializzazione della lingua",
+  "db.open.failed": "{icon-err}Impossibile avviare il database",
+  "db.migrate.failed": "Migrazione del database fallita: {error}",
+  "db.schema.verified": "Lo schema del database è aggiornato.",
+  "config.migrate.failed": "Migrazione della configurazione fallita: {error}",
+  "config.schema.verified": "Configurazione verificata.",
+  "db.schema.already_update": "Lo schema del database è già aggiornato."
+}

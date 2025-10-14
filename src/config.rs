@@ -12,6 +12,7 @@
 pub mod migrate;
 
 use serde::{Deserialize, Serialize};
+use serde_yaml::Value;
 use std::io::Write;
 use std::{env, fs, path::PathBuf};
 
@@ -26,6 +27,7 @@ use std::{env, fs, path::PathBuf};
 pub struct AppConfig {
     /// Path to the local SQLite database
     pub database: String,
+    pub language: String,
 }
 
 impl Default for AppConfig {
@@ -33,6 +35,7 @@ impl Default for AppConfig {
         let database = default_db_path();
         Self {
             database: database.to_string_lossy().to_string(),
+            language: "en".to_string(),
         }
     }
 }
@@ -113,4 +116,18 @@ pub fn load_or_init() -> Result<AppConfig, Box<dyn std::error::Error>> {
         file.write_all(yaml.as_bytes())?;
         Ok(cfg)
     }
+}
+
+/// Reads the `language` field from librius.conf if present.
+pub fn load_language_from_conf() -> Option<String> {
+    let conf_path = config_file_path();
+    if !conf_path.exists() {
+        return None;
+    }
+
+    let content = fs::read_to_string(conf_path).ok()?;
+    let yaml: Value = serde_yaml::from_str(&content).ok()?;
+    yaml.get("language")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_string())
 }

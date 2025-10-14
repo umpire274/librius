@@ -11,6 +11,7 @@
 pub mod migrate;
 
 use crate::config::AppConfig;
+use crate::i18n::tr;
 use crate::utils::{is_verbose, print_err, print_info, print_ok, write_log};
 use rusqlite::{Connection, Result};
 use std::path::Path;
@@ -89,7 +90,7 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
                 let _ = write_log(&conn, "DB_MIGRATION_OK", "DB", &msg);
             }
             migrate::MigrationResult::None => {
-                print_ok("Database schema is already up-to-date.", is_verbose());
+                print_ok(&tr("db.schema.already_update"), is_verbose());
             }
         },
     }
