@@ -86,7 +86,7 @@ cargo run -- list
 
 If this is the first launch, Librius will automatically create:
 
-- The config file at `~/.config/librius/librius.toml`
+- The config file at `~/.config/librius/librius.conf`
 - A SQLite database at `~/.config/librius/librius.sqlite`
 
 ---
@@ -107,8 +107,8 @@ $ librius list
 
 ```yaml
 # librius.conf
-database: "C:/Users/YourName/AppData/Roaming/librius/librius.db"
-language: "English"
+database: "C:/Users/YourName/AppData/Roaming/librius/librius.sqlite"
+language: "en"
 ```
 
 - Configuration file is automatically migrated if fields are missing or renamed.
@@ -139,8 +139,9 @@ This will build the documentation and open it in your default browser.
 clap — Command-line argument parsing
 rusqlite — SQLite database
 serde — Serialization/deserialization
-toml — Config format support
+serde_yaml — YAML data format for Serde
 colored — Colored terminal output
+chrono — Date and time library for Rust
 
 ---
 
