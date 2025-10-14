@@ -1,13 +1,13 @@
 [package]
 name = "librius"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2024"
 authors = ["Alessandro Maestri <umpire274@github.com>"]
 description = "A personal library manager CLI written in Rust."
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/umpire274/librius"
-repository = "https://github.com/umpire274/rbackup"
+repository = "https://github.com/umpire274/librius"
 keywords = ["books", "library", "cli", "sqlite", "manager"]
 categories = ["command-line-utilities", "database", "data-structures", "rust-patterns"]
 exclude = [
