@@ -68,6 +68,93 @@ cargo install rtimelogger
 
 ---
 
+## 🌍 Multilanguage support (i18n)
+
+Librius now supports a multilingual interface.
+
+| Source       | 	Description                                                    |
+|--------------|-----------------------------------------------------------------|
+| 🇬🇧 en.json | 	Default English messages                                       |
+| 🇮🇹 it.json | 	Italian translation                                            |
+| 📄 README.md | 	Located in src/i18n/locales/, describes key naming conventions |
+
+### How it works
+
+- On startup, Librius loads the language defined in:
+    1. CLI argument --lang / -l
+    2. Configuration file language:
+    3. Fallback to English (en)
+- All user-visible messages (print_info, print_err, etc.) are translated dynamically.
+- Missing keys automatically fall back to their key name or English equivalent.
+
+### Example usage
+
+```bash
+# Default (English)
+librius list
+
+# Force Italian interface
+librius list --lang it
+```
+
+### Example config (`librius.conf`)
+
+```yaml
+# librius.conf
+database: "C:/Users/YourName/AppData/Roaming/librius/librius.sqlite"
+language: "it"  # Set default language to Italian
+```
+
+---
+
+## 🧩 Translations
+
+All translations are stored in:
+
+```bash
+src/i18n/locales/
+├── en.json
+├── it.json
+└── README.md
+```
+
+Each `.json` file contains key–value pairs like:
+
+```json
+{
+  "app.config.loading": "Loading configuration...",
+  "db.init.ok": "Database created successfully.",
+  "book.add.ok": "Book '{title}' added successfully!"
+}
+```
+
+Variables can be inserted at runtime:
+
+```rust
+tr_with("db.path.open_existing", & [("path", & db_path)]);
+```
+
+---
+
+## 🐍 Helper script
+
+A helper script is provided to keep translations up to date:
+
+```bash
+python scripts/extract_translations.py
+```
+
+It scans all Rust source files and adds missing user-facing strings to `src/i18n/locales/en.json` without overwriting
+existing entries.
+
+---
+
+## 🧾 Changelog reference
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed list of changes and updates.
+
+---
+
 ## 🚀 Quick start
 
 ### 1️⃣ Clone the repository

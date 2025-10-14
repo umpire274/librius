@@ -16,8 +16,23 @@ use rusqlite::Connection;
 )]
 pub struct Cli {
     /// Enable verbose output (debug mode)
-    #[arg(short, long, global = true)]
+    #[arg(
+        short,
+        long,
+        global = true,
+        help = "Enable verbose output (debug mode)"
+    )]
     pub verbose: bool,
+
+    /// Specify the language for the interface (e.g. "en", "it")
+    /// This overrides the language set in the configuration file.
+    #[arg(
+        short,
+        long,
+        global = true,
+        help = "Specify the interface language (e.g. 'en', 'it')"
+    )]
+    pub lang: Option<String>,
 
     /// The command to execute
     #[command(subcommand)]

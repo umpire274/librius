@@ -1,0 +1,9 @@
+{
+  "app.init.language": "Initializing language",
+  "db.open.failed": "{icon-err}Unable to start database",
+  "db.migrate.failed": "Database migration failed: {error}",
+  "db.schema.verified": "Database schema is up-to-date.",
+  "config.migrate.failed": "Config migration failed: {error}",
+  "config.schema.verified": "Configuration verified.",
+  "db.schema.already_update": "Database schema is already up-to-date."
+}

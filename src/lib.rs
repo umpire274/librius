@@ -23,6 +23,7 @@ pub mod cli;
 pub mod commands;
 pub mod config;
 pub mod db;
+pub mod i18n;
 pub mod models;
 pub mod utils;
 
