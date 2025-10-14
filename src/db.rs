@@ -11,7 +11,7 @@
 pub mod migrate;
 
 use crate::config::AppConfig;
-use crate::i18n::tr;
+use crate::i18n::{tr, tr_with};
 use crate::utils::{is_verbose, print_err, print_info, print_ok, write_log};
 use rusqlite::{Connection, Result};
 use std::path::Path;
@@ -28,15 +28,15 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
 
     if db_exists {
         print_info(
-            &format!("Opening existing database at: {}", db_path.display()),
+            &tr_with(
+                "db.open.existing",
+                &[("db_path", &db_path.display().to_string())],
+            ),
             is_verbose(),
         );
     } else {
         print_info(
-            &format!(
-                "Database not found, creating new one at: {}",
-                db_path.display()
-            ),
+            &tr_with("db.create.new_db", &[("db_path", &db_path.display().to_string())]),
             is_verbose(),
         );
     }
@@ -59,9 +59,9 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
     // Log opening
     let action = if db_exists { "DB_OPENED" } else { "DB_CREATED" };
     let msg = if db_exists {
-        format!("Opened database '{}'", db_path.display())
+        &tr_with("log.db.open",&[("db_path", &db_path.display().to_string())])
     } else {
-        format!("Created new database '{}'", db_path.display())
+        &tr_with("log.db.create",&[("db_path", &db_path.display().to_string())])
     };
     let _ = write_log(&conn, action, "DB", &msg);
 

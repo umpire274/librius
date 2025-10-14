@@ -4,6 +4,7 @@
 //! in the database. The function performs a simple SELECT query and prints
 //! a human-readable list to standard output using colored formatting.
 
+use crate::i18n::tr;
 use crate::models::Book;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use colored::*;
@@ -62,7 +63,7 @@ pub fn handle_list(conn: &Connection) -> Result<(), Box<dyn Error>> {
         })
     })?;
 
-    println!("\n{}", "📚 Your Library".bold().green());
+    println!("\n{}", &tr("app.library.info").bold().green());
     for b in rows {
         let b = b?;
         // Format added_at as YYYY-MM-DD when present

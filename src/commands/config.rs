@@ -1,10 +1,11 @@
 use crate::cli::Commands;
 use crate::config;
-use crate::utils::icons::*;
-use colored::*;
+use crate::i18n::{tr, tr_with};
+use crate::utils::{print_err, print_info, print_ok, print_warn};
 use std::fs;
 use std::path::Path;
 use std::process::Command;
+
 pub fn handle_config(cmd: &Commands) -> rusqlite::Result<()> {
     let config_path = config::config_file_path();
 
@@ -20,43 +21,36 @@ pub fn handle_config(cmd: &Commands) -> rusqlite::Result<()> {
             if config_path.exists() {
                 match fs::read_to_string(&config_path) {
                     Ok(contents) => {
-                        println!("\n{}{}\n", INFO, "Current configuration:".bold().green());
-                        println!("{}", contents);
+                        println!();
+                        print_info(&tr("config.schema.list"), true);
+                        println!("\n{}", contents);
                     }
-                    Err(e) => eprintln!("{}{} {}", ERR, "Error reading config:".red(), e),
+                    Err(e) => {
+                        print_err(&tr_with("config.open.failed", &[("error", &e.to_string())]))
+                    }
                 }
             } else {
-                eprintln!(
-                    "{}{}",
-                    WARN,
-                    "Configuration file not found. Run `librius config --init` first.".yellow()
-                );
+                print_warn(&tr("config.file.not_found"));
             }
         }
 
         // --init
         if *init {
             if config_path.exists() {
-                println!(
-                    "\n{}{}",
-                    WARN,
-                    "Configuration file already exists.".yellow()
-                );
+                print_warn(&tr("config.file.exists"));
             } else {
                 if let Err(e) = config::load_or_init() {
-                    eprintln!(
-                        "{}{} {}",
-                        ERR,
-                        "Error creating default configuration:".red(),
-                        e
-                    );
+                    print_err(&tr_with(
+                        "config.file.init_failed",
+                        &[("error", &e.to_string())],
+                    ));
                 }
-                println!(
-                    "{}{}",
-                    OK,
-                    format!("Created new configuration at: {}", config_path.display())
-                        .bold()
-                        .green()
+                print_ok(
+                    &tr_with(
+                        "config.file.created",
+                        &[("path", &config_path.display().to_string())],
+                    ),
+                    true,
                 );
             }
         }
@@ -67,7 +61,10 @@ pub fn handle_config(cmd: &Commands) -> rusqlite::Result<()> {
             if !config_path.exists()
                 && let Err(e) = config::load_or_init()
             {
-                eprintln!("{}{} {}", ERR, "Error creating config file:".red(), e);
+                print_err(&tr_with(
+                    "config.file.create_failed",
+                    &[("error", &e.to_string())],
+                ));
             }
 
             // User-requested editor (if provided)
@@ -90,53 +87,39 @@ pub fn handle_config(cmd: &Commands) -> rusqlite::Result<()> {
             let status = Command::new(editor_path).arg(&config_path).status();
             match status {
                 Ok(s) if s.success() => {
-                    println!(
-                        "{}{}",
-                        OK,
-                        format!(
-                            "Configuration file edited successfully with '{}'",
-                            editor_path.display()
-                        )
-                        .bold()
-                        .green()
+                    print_ok(
+                        &tr_with(
+                            "config.file.edited_with",
+                            &[("editor", &editor_path.display().to_string())],
+                        ),
+                        true,
                     );
                 }
                 Ok(_) | Err(_) => {
-                    eprintln!(
-                        "{}{}",
-                        ERR,
-                        format!(
-                            "Editor '{}' not available, falling back to '{}'",
-                            editor_path.display(),
-                            default_editor
-                        )
-                        .red()
-                    );
+                    print_err(&tr_with(
+                        "config.file.editor_not_available",
+                        &[
+                            ("editor", &editor_path.display().to_string()),
+                            ("defaultEditor", &default_editor),
+                        ],
+                    ));
                     // Retry with the default editor
                     let fallback_status = Command::new(&default_editor).arg(&config_path).status();
                     match fallback_status {
                         Ok(s) if s.success() => {
-                            println!(
-                                "{}{}",
-                                OK,
-                                format!(
-                                    "Configuration file edited successfully with fallback '{}'",
-                                    default_editor
-                                )
-                                .bold()
-                                .green()
+                            print_ok(
+                                &tr_with(
+                                    "config.file.edited_fallback",
+                                    &[("editor", &default_editor)],
+                                ),
+                                true,
                             );
                         }
                         Ok(_) | Err(_) => {
-                            eprintln!(
-                                "{}{}",
-                                ERR,
-                                format!(
-                                    "Failed to edit configuration file with fallback '{}'",
-                                    default_editor
-                                )
-                                .red()
-                            );
+                            print_err(&tr_with(
+                                "config.file.edit_failed_fallback",
+                                &[("editor", &default_editor)],
+                            ));
                         }
                     }
                 }

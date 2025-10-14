@@ -28,18 +28,12 @@ pub fn load_language(lang_code: &str) {
         Ok(translations) => {
             *map = translations;
             print_info(
-                format!("Loaded language: {}", lang_code).as_str(),
+                &tr_with("app.language.loaded", &[("lang", lang_code)]),
                 is_verbose(),
             );
         }
         Err(_) => {
-            print_warn(
-                format!(
-                    "Warning: language '{}' not found. Falling back to English.",
-                    lang_code
-                )
-                .as_str(),
-            );
+            print_warn(&tr_with("app.language.not_found", &[("lang", lang_code)]));
             if let Ok(fallback) = load_from_file("src/i18n/locales/en.json") {
                 *map = fallback;
             }

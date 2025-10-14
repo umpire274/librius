@@ -1,3 +1,4 @@
+use crate::i18n::{tr, tr_with};
 use crate::utils::{is_verbose, print_err, print_info, print_ok, write_log};
 use rusqlite::{Connection, Result};
 
@@ -38,7 +39,10 @@ pub fn run_migrations(conn: &Connection) -> Result<MigrationResult> {
 
     for (name, patch_fn) in patches {
         if !is_patch_applied(conn, name)? {
-            print_info(&format!("Applying database patch: {}", name), is_verbose());
+            print_info(
+                &tr_with("db.patch,applying", &[("patch", name)]),
+                is_verbose(),
+            );
             patch_fn(conn)?;
             applied_patches.push(name.to_string());
             record_patch(conn, name, "DB", "Migration applied successfully")?;
@@ -52,9 +56,9 @@ pub fn run_migrations(conn: &Connection) -> Result<MigrationResult> {
             conn,
             "MIGRATIONS_COMPLETED",
             "DB",
-            "All pending migrations applied",
+            &tr("db.patch.all_applied"),
         )?;
-        print_ok("All pending migrations applied.", is_verbose());
+        print_ok(&tr("db.patch.all_applied"), is_verbose());
         Ok(MigrationResult::Applied(applied_patches))
     }
 }
@@ -95,7 +99,7 @@ fn patch_001_create_books_table(conn: &Connection) -> Result<()> {
 
 /// Second migration: safely add new fields if missing (language, pages, genre, summary)
 fn patch_002_add_extra_fields(conn: &Connection) -> Result<()> {
-    print_info("Checking for missing columns in 'books'...", is_verbose());
+    print_info(&tr("db.check.missing_columns"), is_verbose());
 
     // Fetch existing column names
     let mut stmt = conn.prepare("PRAGMA table_info(books);")?;
@@ -120,36 +124,33 @@ fn patch_002_add_extra_fields(conn: &Connection) -> Result<()> {
     for (col, typ) in new_cols {
         if !existing_cols.iter().any(|c| c.eq_ignore_ascii_case(col)) {
             let sql = format!("ALTER TABLE books ADD COLUMN {} {};", col, typ);
-            print_info(
-                &format!("Adding column '{}' to books...", col),
-                is_verbose(),
-            );
+            print_info(&tr_with("db.add.column", &[("column", col)]), is_verbose());
             match conn.execute_batch(&sql) {
                 Ok(_) => {
                     print_ok(
-                        &format!("Column '{}' added successfully.", col),
+                        &tr_with("db.column.added", &[("column", col)]),
                         is_verbose(),
                     );
                     let _ = write_log(
                         conn,
                         "DB_MIGRATION",
                         "DB",
-                        &format!("Added column '{}'", col),
+                        &tr_with("log.column.added", &[("column", col)]),
                     );
                     added_any = true;
                 }
                 Err(e) => {
-                    print_err(&format!("Failed to add column '{}': {}", col, e));
+                    print_err(&tr_with(
+                        "db.add.column_failed",
+                        &[("column", col), ("error", &e.to_string())],
+                    ));
                 }
             }
         }
     }
 
     if !added_any {
-        print_ok(
-            "All required columns already exist. No changes applied.",
-            is_verbose(),
-        );
+        print_ok(&tr("db.column.all_extra_exists"), is_verbose());
     }
 
     Ok(())
