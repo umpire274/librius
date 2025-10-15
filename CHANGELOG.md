@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.5] - Unreleased
+
+### Added
+
+- **Backup command** (`librius backup`)
+    - Creates plain `.sqlite` backups in the `backups/` directory
+    - Optional `--compress` flag for compressed backups
+        - `.zip` format on Windows
+        - `.tar.gz` format on macOS and Linux
+    - Localized help and messages via i18n (English and Italian)
+    - Timestamp-based file naming for safe sequential backups
+
+- **Export command** (`librius export`)
+    - Added support for exporting library data in multiple formats:
+        - `--csv` (default): plain text export with semicolon delimiter
+        - `--json`: structured JSON array output
+        - `--xlsx`: formatted Excel file using umya-spreadsheet
+    - Localized CLI help and status messages (English/Italian)
+    - Automatic export directory and timestamped filenames
+    - Uses `dirs` crate for cross-platform export path handling
+
+- **Import command** (`librius import`)
+    - Supports importing book data from external sources
+    - Available formats:
+        - `--csv` (default): semicolon-delimited CSV
+        - `--json`: JSON array of objects
+    - Unified parsing via `serde` and shared `BookRecord` struct
+    - Duplicate detection through unique index on `isbn`
+    - Uses `INSERT OR IGNORE` for idempotent imports (no duplication)
+    - Verbose mode logs skipped records (e.g., “Skipped duplicate ISBN: …”)
+    - Non-blocking import completion logging
+
+### Database
+
+- Added migration `PATCH_004_ISBN_INDEX`:
+    - Creates unique index on `books.isbn` to prevent duplicates
+    - Automatically applied during startup migrations
+
+### Technical
+
+- Added dependency: `csv = "1.3"` for CSV import with serde
+- Unified SQL insert logic via `insert_book_record()` helper
+- Improved transaction safety and i18n message consistency
+
+---
+
 ## [0.2.4] - 2025-10-15
 
 ### Added

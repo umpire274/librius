@@ -20,17 +20,35 @@ and import/export support.
 
 ---
 
-## ✨ New in v0.2.4
+## ✨ New in v0.2.5
 
-- **Localized command-line interface**: all commands, subcommands, and help texts are now available in multiple
-  languages.
-- **Embedded language files** (`en.json`, `it.json`): no external i18n folder or file loading needed.
-- **Automatic language detection**:
-    - from `--lang <code>` argument (highest priority)
-    - from the `language` key in `librius.conf` (YAML configuration)
-    - fallback to English (`en`) if unspecified
-- **Improved Clap integration**: localized help and version flags, stable behavior for `--help` and subcommands.
-- **Refined startup sequence**: configuration and database are initialized after language setup.
+- **Backup command** (`librius backup`)
+    - Creates plain `.sqlite` backups in the `backups/` directory
+    - Optional `--compress` flag for compressed backups
+        - `.zip` format on Windows
+        - `.tar.gz` format on macOS and Linux
+    - Localized help and messages via i18n (English and Italian)
+    - Timestamp-based file naming for safe sequential backups
+
+- **Export command** (`librius export`)
+    - Added support for exporting library data in multiple formats:
+        - `--csv` (default): plain text export with semicolon delimiter
+        - `--json`: structured JSON array output
+        - `--xlsx`: formatted Excel file using umya-spreadsheet
+    - Localized CLI help and status messages (English/Italian)
+    - Automatic export directory and timestamped filenames
+    - Uses `dirs` crate for cross-platform export path handling
+
+- **Import command** (`librius import`)
+    - Supports importing book data from external sources
+    - Available formats:
+        - `--csv` (default): semicolon-delimited CSV
+        - `--json`: JSON array of objects
+    - Unified parsing via `serde` and shared `BookRecord` struct
+    - Duplicate detection through unique index on `isbn`
+    - Uses `INSERT OR IGNORE` for idempotent imports (no duplication)
+    - Verbose mode logs skipped records (e.g., “Skipped duplicate ISBN: …”)
+    - Non-blocking import completion logging
 
 ---
 
@@ -71,6 +89,9 @@ cargo install rtimelogger
 |:------:|:-------------------------|:----------------------------------------------------------------------------|
 |   ✅    | **List**                 | Display all books stored in the local database                              |
 |   ✅    | **Config management**    | Manage YAML config via `config --print`, `--init`, `--edit`, and `--editor` |
+|   ✅    | **Backup**               | Create plain or compressed database backups (`.sqlite`, `.zip`, `.tar.gz`)  |
+|   ✅    | **Export**               | Export data in CSV, JSON, or XLSX format                                    |
+|   ✅    | **Import**               | Import data from CSV or JSON files (duplicate-safe via ISBN)                |
 |   ✅    | **Database migrations**  | Automatic schema upgrades at startup                                        |
 |   ✅    | **Logging system**       | Records operations and migrations in log table                              |
 |   ✅    | **Verbose mode**         | Optional `--verbose` flag for detailed debug output                         |
@@ -156,6 +177,48 @@ See [CHANGELOG.md](CHANGELOG.md) for a detailed list of changes and updates.
 
 ---
 
+## 📤 Export & 📥 Import
+
+Librius now supports full data import/export functionality.
+
+### Export
+
+You can export your library to multiple formats:
+
+```bash
+librius export --csv     # CSV (default)
+librius export --json    # JSON
+librius export --xlsx    # Excel (XLSX)
+```
+
+Exports are automatically saved in your user data directory
+(e.g. `~/.config/librius/exports` or `%APPDATA%\librius\exports`).
+
+### Import
+
+Import books from CSV or JSON files:
+
+```bash
+librius import --file examples/books.csv
+librius import --file examples/books.json --json
+```
+
+Features:
+
+- Automatic detection of duplicate records via unique `isbn`
+- Skips duplicates gracefully (no interruption)
+- Transaction-safe import
+- Verbose mode logs skipped ISBNs
+
+Example output:
+
+```bash
+📘  Skipped duplicate ISBN: 978-0-345-33968-3
+✅ Imported 6 records from CSV file.
+```
+
+---
+
 ## 🚀 Quick start
 
 ### 1️⃣ Clone the repository
@@ -225,8 +288,11 @@ This will build the documentation and open it in your default browser.
 ## 🧰 Dependencies
 
 - **clap** — Command-line argument parsing
-- **rusqlite** — SQLite database
-- **serde / serde_yaml** — Serialization, YAML configuration
+- **rusqlite** — SQLite database integration
+- **serde / serde_json** — Serialization/deserialization
+- **serde_yaml** — YAML config parsing
+- **umya-spreadsheet** — XLSX file creation
+- **csv** — CSV import/export
 - **colored** — Colored terminal output
 - **chrono** — Date and time utilities
 
@@ -235,6 +301,13 @@ This will build the documentation and open it in your default browser.
 ## 🗄️ Database management
 
 Librius automatically verifies and upgrades the SQLite database schema at startup.
+
+The latest migration adds a unique index on `isbn` to guarantee
+that duplicate imports are ignored safely.
+
+```sql
+CREATE UNIQUE INDEX IF NOT EXISTS idx_books_isbn ON books(isbn);
+```
 
 - On first launch → creates books table.
 - On subsequent launches → runs pending migrations silently.
