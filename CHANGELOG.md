@@ -2,26 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.4] - 2025-10-15
+
+### Added
+
+- Full internationalization (i18n) for CLI help, subcommands, and arguments.
+- Embedded JSON language files (`en.json`, `it.json`) — no external dependencies required.
+- Dynamic language selection via `--lang <code>` or the `language` key in `librius.conf` (YAML).
+
+### Fixed
+
+- Resolved duplicated `--help` and `--version` flag conflicts in Clap.
+- Restored proper `--help` propagation for subcommands (`list`, `config`).
+- Ensured fallback to English if an unknown language code is provided.
+
+### Changed
+
+- Pre-language bootstrap messages (e.g., “Load configuration...”) remain in English for clarity.
+- Improved initialization order: configuration and DB migrations now run after language setup.
+
+### Notes
+
+- Default language remains English unless overridden by `--lang` or the `language` field in `librius.conf` (YAML).
+- This version finalizes the transition to a fully localized CLI core.
+
+---
+
 ## [v0.2.3] - 2025-10-14
 
 ### Added
+
 - **Multilanguage support (i18n)**:
-  - Added `i18n` module with `load_language()` and `tr()` functions.
-  - Introduced translation files under `src/i18n/locales/` (`en.json`, `it.json`).
-  - Added `src/i18n/locales/README.md` with key naming conventions.
-  - CLI option `--lang` (or `-l`) allows overriding the language from configuration.
-  - Config file can define a `language:` field for persistent preference.
-  - Added `tr_with()` utility for runtime placeholder substitution (e.g., `{path}`, `{title}`).
-- **Fallback system**: if a translation key is missing or the language file is unavailable, English (`en.json`) is used automatically.
+    - Added `i18n` module with `load_language()` and `tr()` functions.
+    - Introduced translation files under `src/i18n/locales/` (`en.json`, `it.json`).
+    - Added `src/i18n/locales/README.md` with key naming conventions.
+    - CLI option `--lang` (or `-l`) allows overriding the language from configuration.
+    - Config file can define a `language:` field for persistent preference.
+    - Added `tr_with()` utility for runtime placeholder substitution (e.g., `{path}`, `{title}`).
+- **Fallback system**: if a translation key is missing or the language file is unavailable, English (`en.json`) is used
+  automatically.
 - **Python helper script** (`scripts/extract_translations.py`):
-  - Scans Rust source files for user-facing strings.
-  - Updates `en.json` with any missing entries without overwriting existing ones.
+    - Scans Rust source files for user-facing strings.
+    - Updates `en.json` with any missing entries without overwriting existing ones.
 
 ### Changed
+
 - All user-facing messages (`print_info`, `print_ok`, `print_err`, `println!`, etc.) are now translatable.
 - Main startup sequence (`main.rs`) loads the selected language before configuration and database initialization.
 
 ### Improved
+
 - Added helper in `config.rs` to read language preference directly from `librius.conf`.
 - Enhanced verbosity filtering to respect localized messages.
 - Clearer structure for future locale additions (fr, es, de, ...).

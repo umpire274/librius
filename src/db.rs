@@ -11,7 +11,7 @@
 pub mod migrate;
 
 use crate::config::AppConfig;
-use crate::i18n::tr;
+use crate::i18n::{tr, tr_with};
 use crate::utils::{is_verbose, print_err, print_info, print_ok, write_log};
 use rusqlite::{Connection, Result};
 use std::path::Path;
@@ -28,14 +28,17 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
 
     if db_exists {
         print_info(
-            &format!("Opening existing database at: {}", db_path.display()),
+            &tr_with(
+                "db.open.existing",
+                &[("db_path", &db_path.display().to_string())],
+            ),
             is_verbose(),
         );
     } else {
         print_info(
-            &format!(
-                "Database not found, creating new one at: {}",
-                db_path.display()
+            &tr_with(
+                "db.create.new_db",
+                &[("db_path", &db_path.display().to_string())],
             ),
             is_verbose(),
         );
@@ -59,35 +62,47 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
     // Log opening
     let action = if db_exists { "DB_OPENED" } else { "DB_CREATED" };
     let msg = if db_exists {
-        format!("Opened database '{}'", db_path.display())
+        &tr_with(
+            "log.db.open",
+            &[("db_path", &db_path.display().to_string())],
+        )
     } else {
-        format!("Created new database '{}'", db_path.display())
+        &tr_with(
+            "log.db.create",
+            &[("db_path", &db_path.display().to_string())],
+        )
     };
-    let _ = write_log(&conn, action, "DB", &msg);
+    let _ = write_log(&conn, action, "DB", msg);
 
     // Initialize structure if missing
     if !db_exists {
-        print_info("Initializing new database structure...", is_verbose());
+        print_info(&tr("db.schema.initializing"), is_verbose());
         if let Err(e) = ensure_schema(&conn) {
-            print_err(&format!("Database initialization failed: {}", e));
+            print_err(&tr_with(
+                "db.schema.init_failed",
+                &[("error", &e.to_string())],
+            ));
             let _ = write_log(&conn, "DB_INIT_FAIL", "DB", &e.to_string());
             return Err(e);
         }
-        print_ok("Database created successfully.", is_verbose());
-        let _ = write_log(&conn, "DB_INIT_OK", "DB", "Initial database schema created");
+        print_ok(&tr("db.schema.created"), is_verbose());
+        let _ = write_log(&conn, "DB_INIT_OK", "DB", &tr("log.db.schema.init"));
     }
 
     // Apply migrations
     match migrate::run_migrations(&conn) {
         Err(e) => {
-            print_err(&format!("Database migration failed: {}", e));
+            print_err(&tr_with("db.migrate.failed", &[("error", &e.to_string())]));
             let _ = write_log(&conn, "DB_MIGRATION_FAIL", "DB", &e.to_string());
         }
         Ok(result) => match result {
             migrate::MigrationResult::Applied(patches) => {
-                print_ok("Database migrations applied successfully.", is_verbose());
-                let msg = format!("Applied patches: {}", patches.join(", "));
-                let _ = write_log(&conn, "DB_MIGRATION_OK", "DB", &msg);
+                print_ok(&tr("db.migrate.applied"), is_verbose());
+                let msg = &tr_with(
+                    "log.db.patch_applied",
+                    &[("patchCreata nuova configurazione in", &patches.join(", "))],
+                );
+                let _ = write_log(&conn, "DB_MIGRATION_OK", "DB", msg);
             }
             migrate::MigrationResult::None => {
                 print_ok(&tr("db.schema.already_update"), is_verbose());
