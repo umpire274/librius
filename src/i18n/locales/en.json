@@ -22,7 +22,7 @@
   "app.mapping.just_created": "Mapping just created",
   "app.yaml.serialize_error": "Failed to serialize YAML",
   "config.file.migrated": "Configuration file migrated",
-  "db.patch,applying": "Applying database patch: {patch}",
+  "db.patch.applying": "Applying database patch: {patch}",
   "db.patch.all_applied": "All pending migrations applied.",
   "db.check.missing_columns": "Checking for missing columns in 'books'...",
   "db.add.column": "Adding column '{column}' to books table...",
@@ -35,5 +35,11 @@
   "db.open.existing": "Opening existing database at: {db_path}",
   "db.create.new_db": "Database not found, creating new one at: {db_path}",
   "log.db.open": "Opened database '{db_path}'",
-  "log.db.create": "Created new database '{db_path}'"
+  "log.db.create": "Created new database '{db_path}'",
+  "db.schema.initializing": "Initializing new database structure...",
+  "db.schema.created": "Database created successfully.",
+  "log.db.schema.init": "Initial database schema created",
+  "db.schema.init_failed": "Database initialization failed: {error}",
+  "db.migrate.applied": "Database migrations applied successfully.",
+  "log.db.patch_applied": "Applied database patch: {patch}"
 }
