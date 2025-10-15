@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
         - `.tar.gz` format on macOS and Linux
     - Localized help and messages via i18n (English and Italian)
     - Timestamp-based file naming for safe sequential backups
+    - Fixed backup compression error on macOS/Linux (`paths in archives must be relative`).
 
 - **Export command** (`librius export`)
     - Added support for exporting library data in multiple formats:
