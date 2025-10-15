@@ -3,7 +3,7 @@ use librius::config;
 use librius::db;
 use librius::i18n::{load_language, tr, tr_with};
 use librius::utils::icons::ERR;
-use librius::utils::{is_verbose, print_err, print_info, print_ok, set_verbose, write_log};
+use librius::utils::{is_verbose, print_err, print_info, print_ok, set_verbose};
 
 fn main() {
     // ------------------------------------------------------------
@@ -58,16 +58,8 @@ fn main() {
     // ------------------------------------------------------------
     // 4️⃣ Inizializza o apre il database
     // ------------------------------------------------------------
-    let conn = db::start_db(&config)
+    let mut conn = db::start_db(&config)
         .unwrap_or_else(|_| panic!("{}", &tr_with("db.open.failed", &[("icon-err", ERR)])));
-
-    write_log(
-        &conn,
-        "LANG_SET",
-        "I18N",
-        &tr_with("log.language.set", &[("lang", &lang_code)]),
-    )
-    .ok();
 
     // ------------------------------------------------------------
     // 5️⃣ Esegue migrazioni DB e config
@@ -91,7 +83,7 @@ fn main() {
     // 6️⃣ CLI localizzata ed esecuzione comandi
     // ------------------------------------------------------------
     let matches = build_cli().get_matches();
-    if let Err(e) = run_cli(&matches, &conn) {
+    if let Err(e) = run_cli(&matches, &mut conn) {
         print_err(&format!("{} {}", ERR, e));
     }
 }

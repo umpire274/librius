@@ -4,5 +4,8 @@
 //! `list`) so documentation generators can show the available commands and
 //! their handlers.
 
+pub mod backup;
 pub mod config;
+pub mod export;
+pub mod import;
 pub mod list;

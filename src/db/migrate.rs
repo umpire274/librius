@@ -35,6 +35,10 @@ pub fn run_migrations(conn: &Connection) -> Result<MigrationResult> {
             "PATCH_002",
             patch_002_add_extra_fields as fn(&Connection) -> Result<()>,
         ),
+        (
+            "PATCH_003",
+            patch_003_add_unique_index_books_isbn as fn(&Connection) -> Result<()>,
+        ),
     ];
 
     for (name, patch_fn) in patches {
@@ -154,4 +158,44 @@ fn patch_002_add_extra_fields(conn: &Connection) -> Result<()> {
     }
 
     Ok(())
+}
+
+/// Migrazione: aggiunge indice UNIQUE su ISBN nella tabella books
+fn patch_003_add_unique_index_books_isbn(conn: &Connection) -> Result<()> {
+    print_info(&tr("db.migrate.checking_isbn_index"), is_verbose());
+
+    // Controlla se l'indice esiste già
+    let exists: bool = conn
+        .query_row(
+            "SELECT EXISTS (
+                SELECT 1 FROM sqlite_master
+                WHERE type='index' AND name='idx_books_isbn'
+            )",
+            [],
+            |row| row.get(0),
+        )
+        .unwrap_or(false);
+
+    if exists {
+        print_info(&tr("db.migrate.isbn_index_exists"), is_verbose());
+        return Ok(());
+    }
+
+    // Crea l'indice UNIQUE su isbn
+    match conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_books_isbn ON books(isbn)",
+        [],
+    ) {
+        Ok(_) => {
+            print_ok(&tr("db.migrate.isbn_index_created"), is_verbose());
+            Ok(())
+        }
+        Err(e) => {
+            print_err(&tr_with(
+                "db.migrate.isbn_index_failed",
+                &[("error", &e.to_string())],
+            ));
+            Err(e)
+        }
+    }
 }

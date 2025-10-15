@@ -21,3 +21,4 @@ target
 .idea/
 *.zip
 *.tar.gz
+examples/
