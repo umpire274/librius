@@ -56,5 +56,10 @@
   "config_edit_help": "Modifica il file di configurazione (editor predefinito: $EDITOR, o nano/vim/notepad)",
   "config_editor_help": "Specifica l'editor da utilizzare (vim, nano o percorso personalizzato)",
   "help_flag_about": "Mostra questo messaggio o l'aiuto dei sotto comandi",
-  "version_flag_about": "Mostra la versione"
+  "version_flag_about": "Mostra la versione",
+  "backup_about": "Crea una copia di backup del database di Librius",
+  "backup_compress_help": "Comprimi il backup (.zip su Windows, .tar.gz su Unix)",
+  "backup.error.not_found": "File di database non trovato.",
+  "backup.ok.plain": "Backup creato in {path}",
+  "backup.ok.compressed": "Backup creato e compresso in {path}"
 }

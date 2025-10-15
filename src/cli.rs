@@ -66,6 +66,14 @@ pub fn build_cli() -> Command {
                         .help(tr_s("config_editor_help")),
                 ),
         )
+        .subcommand(
+            Command::new("backup").about(tr_s("backup_about")).arg(
+                Arg::new("compress")
+                    .long("compress")
+                    .help(tr_s("backup_compress_help"))
+                    .action(clap::ArgAction::SetTrue),
+            ),
+        )
         // help come subcommand dedicato (es: `librius help config`)
         .subcommand(
             Command::new("help").about(tr_s("help_flag_about")).arg(
@@ -105,6 +113,11 @@ pub fn run_cli(
             editor,
         };
         Ok(handle_config(&cmd)?)
+    } else if let Some(("backup", sub_m)) = matches.subcommand() {
+        let compress = sub_m.get_flag("compress");
+        // esegue backup plain o compresso (zip su Windows, tar.gz su Unix)
+        crate::commands::backup::handle_backup(conn, compress)?;
+        Ok(())
     } else if let Some(("help", sub_m)) = matches.subcommand() {
         if let Some(cmd_name) = sub_m.get_one::<String>("command") {
             // Stampa help del sotto-comando se esiste

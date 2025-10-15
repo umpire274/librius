@@ -29,6 +29,16 @@ chrono = { version = "0.4.42", features = ["serde"] }
 serde_yaml = "0.9.33"
 rusqlite = { version = "0.37.0", features = ["bundled"] }
 colored = "3.0.0"
+zip = { version = "6.0.0", optional = true }
+flate2 = { version = "1.1.4", optional = true }
+tar = { version = "0.4.44", optional = true }
+
+[target.'cfg(windows)'.dependencies]
+zip = "6.0.0"
+
+[target.'cfg(not(windows))'.dependencies]
+flate2 = "1.1.4"
+tar = "0.4.44"
 
 [profile.release]
 opt-level = 3

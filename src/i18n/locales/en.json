@@ -1,7 +1,7 @@
 {
   "app.init.language": "Initializing language",
   "app.config.loading": "Loading configuration...",
-  "app.config.load_failed": "Unable to load config",
+  "app.config.load_failed": "Unable to load configuration",
   "db.open.failed": "{icon-err}Unable to start database",
   "db.migrate.failed": "Database migration failed: {error}",
   "db.schema.verified": "Database schema is up-to-date.",
@@ -56,5 +56,10 @@
   "config_edit_help": "Edit the configuration file (default editor: $EDITOR, or nano/vim/notepad)",
   "config_editor_help": "Specify the editor to use (vim, nano, or custom path)",
   "help_flag_about": "Print this message or the help of the given subcommand(s)",
-  "version_flag_about": "Print version"
+  "version_flag_about": "Print version",
+  "backup_about": "Create a backup of your Librius database",
+  "backup_compress_help": "Compress the backup (.zip on Windows, .tar.gz on Unix)",
+  "backup.error.not_found": "Database file not found.",
+  "backup.ok.plain": "Backup created at {path}",
+  "backup.ok.compressed": "Backup created and compressed at {path}"
 }
