@@ -72,7 +72,7 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
             &[("db_path", &db_path.display().to_string())],
         )
     };
-    let _ = write_log(&conn, action, "DB", &msg);
+    let _ = write_log(&conn, action, "DB", msg);
 
     // Initialize structure if missing
     if !db_exists {
@@ -98,8 +98,11 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
         Ok(result) => match result {
             migrate::MigrationResult::Applied(patches) => {
                 print_ok(&tr("db.migrate.applied"), is_verbose());
-                let msg = &tr_with("log.db.patch_applied", &[("patchCreata nuova configurazione in", &patches.join(", "))]);
-                let _ = write_log(&conn, "DB_MIGRATION_OK", "DB", &msg);
+                let msg = &tr_with(
+                    "log.db.patch_applied",
+                    &[("patchCreata nuova configurazione in", &patches.join(", "))],
+                );
+                let _ = write_log(&conn, "DB_MIGRATION_OK", "DB", msg);
             }
             migrate::MigrationResult::None => {
                 print_ok(&tr("db.schema.already_update"), is_verbose());

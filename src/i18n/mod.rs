@@ -46,3 +46,7 @@ pub fn tr_with(key: &str, vars: &[(&str, &str)]) -> String {
     }
     s
 }
+
+pub fn tr_s(key: &str) -> &'static str {
+    Box::leak(tr(key).into_boxed_str())
+}

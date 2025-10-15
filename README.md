@@ -20,6 +20,20 @@ and import/export support.
 
 ---
 
+## ✨ New in v0.2.4
+
+- **Localized command-line interface**: all commands, subcommands, and help texts are now available in multiple
+  languages.
+- **Embedded language files** (`en.json`, `it.json`): no external i18n folder or file loading needed.
+- **Automatic language detection**:
+    - from `--lang <code>` argument (highest priority)
+    - from the `language` key in `librius.conf` (YAML configuration)
+    - fallback to English (`en`) if unspecified
+- **Improved Clap integration**: localized help and version flags, stable behavior for `--help` and subcommands.
+- **Refined startup sequence**: configuration and database are initialized after language setup.
+
+---
+
 ## 📦 Installation
 
 ### 🐧 AUR (Arch Linux)
@@ -53,18 +67,18 @@ cargo install rtimelogger
 
 ## ⚙️ Features
 
-| Status | Feature               | Description                                                                 |
-|:------:|:----------------------|:----------------------------------------------------------------------------|
-|   ✅    | **List**              | Display all books stored in the local database                              |
-|   ✅    | **Config management** | Manage YAML config via `config --print`, `--init`, `--edit`, and `--editor` |
-|   ✅	   | Database migrations   | 	Automatic schema upgrades at startup                                       |
-|   ✅	   | Logging system	       | Records operations and migrations in log table                              |
-|   ✅	   | Verbose mode	         | Optional --verbose flag for detailed debug output                           |
-|   ✅	   | Database migrations   | 	Automatic schema updates at startup with detailed logging                  |
-|   ✅	   | Safe patch system     | 	Each migration is idempotent and logged for traceability                   |
-|   🚧   | **Add / Remove**      | Add or delete books via CLI commands                                        |
-|   🚧   | **Search**            | Search by title, author, or ISBN                                            |
-|   🚧   | **Export / Import**   | Export and import data (JSON, CSV)                                          |
+| Status | Feature                  | Description                                                                 |
+|:------:|:-------------------------|:----------------------------------------------------------------------------|
+|   ✅    | **List**                 | Display all books stored in the local database                              |
+|   ✅    | **Config management**    | Manage YAML config via `config --print`, `--init`, `--edit`, and `--editor` |
+|   ✅    | **Database migrations**  | Automatic schema upgrades at startup                                        |
+|   ✅    | **Logging system**       | Records operations and migrations in log table                              |
+|   ✅    | **Verbose mode**         | Optional `--verbose` flag for detailed debug output                         |
+|   ✅    | **Safe patch system**    | Each migration is idempotent and logged for traceability                    |
+|   ✅    | **Multilanguage (i18n)** | Localized CLI (commands, help); embedded JSON; `--lang` + YAML `language`   |
+|   🚧   | **Add / Remove**         | Add or delete books via CLI commands                                        |
+|   🚧   | **Search**               | Search by title, author, or ISBN                                            |
+|   🚧   | **Export / Import**      | Export and import data (JSON, CSV)                                          |
 
 ---
 
@@ -94,7 +108,7 @@ Librius now supports a multilingual interface.
 librius list
 
 # Force Italian interface
-librius list --lang it
+librius --lang it list
 ```
 
 ### Example config (`librius.conf`)
@@ -133,19 +147,6 @@ Variables can be inserted at runtime:
 ```rust
 tr_with("db.path.open_existing", & [("path", & db_path)]);
 ```
-
----
-
-## 🐍 Helper script
-
-A helper script is provided to keep translations up to date:
-
-```bash
-python scripts/extract_translations.py
-```
-
-It scans all Rust source files and adds missing user-facing strings to `src/i18n/locales/en.json` without overwriting
-existing entries.
 
 ---
 
@@ -223,12 +224,11 @@ This will build the documentation and open it in your default browser.
 
 ## 🧰 Dependencies
 
-clap — Command-line argument parsing
-rusqlite — SQLite database
-serde — Serialization/deserialization
-serde_yaml — YAML data format for Serde
-colored — Colored terminal output
-chrono — Date and time library for Rust
+- **clap** — Command-line argument parsing
+- **rusqlite** — SQLite database
+- **serde / serde_yaml** — Serialization, YAML configuration
+- **colored** — Colored terminal output
+- **chrono** — Date and time utilities
 
 ---
 
@@ -309,7 +309,6 @@ cargo clippy
 - Add `add`, `remove`, and `search` commands
 - Export/import JSON and CSV
 - Add optional TUI (Text UI) with `ratatui`
-- Multi-language support (English/Italian)
 - Web dashboard sync
 
 ---

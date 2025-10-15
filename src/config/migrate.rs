@@ -19,8 +19,8 @@ pub fn migrate_config(conn: &Connection, conf_path: &Path) -> io::Result<()> {
         None => {
             yaml = Value::Mapping(Mapping::new());
             // Now it's guaranteed to be a mapping
-            yaml.as_mapping_mut()
-                .expect(&tr("app.mapping.just_created"))
+            let mapping_error_msg = tr("app.mapping.just_created");
+            yaml.as_mapping_mut().expect(&mapping_error_msg)
         }
     };
 

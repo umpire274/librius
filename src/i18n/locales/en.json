@@ -1,5 +1,7 @@
 {
   "app.init.language": "Initializing language",
+  "app.config.loading": "Loading configuration...",
+  "app.config.load_failed": "Unable to load config",
   "db.open.failed": "{icon-err}Unable to start database",
   "db.migrate.failed": "Database migration failed: {error}",
   "db.schema.verified": "Database schema is up-to-date.",
@@ -32,6 +34,7 @@
   "db.column.all_extra_exists": "All required columns already exist. No changes applied.",
   "app.language.loaded": "Loaded language: {lang}",
   "app.language.not_found": "Language '{lang}' not found, falling back to 'en'",
+  "log.language.set": "Language set to '{lang}'",
   "db.open.existing": "Opening existing database at: {db_path}",
   "db.create.new_db": "Database not found, creating new one at: {db_path}",
   "log.db.open": "Opened database '{db_path}'",
@@ -41,5 +44,17 @@
   "log.db.schema.init": "Initial database schema created",
   "db.schema.init_failed": "Database initialization failed: {error}",
   "db.migrate.applied": "Database migrations applied successfully.",
-  "log.db.patch_applied": "Applied database patch: {patch}"
+  "log.db.patch_applied": "Applied database patch: {patch}",
+  "app_name": "Librius",
+  "app_about": "Manage your personal book collection easily",
+  "help_verbose": "Enable verbose output (debug mode)",
+  "help_lang": "Specify the interface language (e.g. 'en', 'it')",
+  "list_about": "List all books in your library",
+  "config_about": "Manage Librius configuration",
+  "config_init_help": "Initialize a new default configuration file",
+  "config_print_help": "Print the current configuration file",
+  "config_edit_help": "Edit the configuration file (default editor: $EDITOR, or nano/vim/notepad)",
+  "config_editor_help": "Specify the editor to use (vim, nano, or custom path)",
+  "help_flag_about": "Print this message or the help of the given subcommand(s)",
+  "version_flag_about": "Print version"
 }

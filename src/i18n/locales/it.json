@@ -1,5 +1,7 @@
 {
   "app.init.language": "Inizializzazione della lingua",
+  "app.config.loading": "Caricamento della configurazione...",
+  "app.config.load_failed": "Impossibile caricare la configurazione",
   "db.open.failed": "{icon-err}Impossibile avviare il database",
   "db.migrate.failed": "Migrazione del database fallita: {error}",
   "db.schema.verified": "Lo schema del database è aggiornato.",
@@ -32,6 +34,7 @@
   "db.column.all_extra_exists": "Tutte le colonne aggiuntive richieste esistono già. Nessuna modifica applicata.",
   "app.language.loaded": "Lingua caricata: {lang}",
   "app.language.not_found": "Lingua '{lang}' non trovata, verrà utilizzato l’inglese",
+  "log.language.set": "Lingua impostata su '{lang}'",
   "db.open.existing": "Apertura del database esistente in: {db_path}",
   "db.create.new_db": "Database non trovato, ne verrà creato uno nuovo in: {db_path}",
   "log.db.open": "Database aperto '{db_path}'",
@@ -41,5 +44,17 @@
   "log.db.schema.init": "Schema iniziale del database creato",
   "db.schema.init_failed": "Inizializzazione del database non riuscita: {errore}",
   "db.migrate.applied": "Migrazioni del database applicate correttamente.",
-  "log.db.patch_applied": "Patch del database applicata: {patch}"
+  "log.db.patch_applied": "Patch del database applicata: {patch}",
+  "app_name": "Librius",
+  "app_about": "Gestisci facilmente la tua libreria personale",
+  "help_verbose": "Abilita l'output dettagliato (modalità debug)",
+  "help_lang": "Specifica la lingua dell'interfaccia (es. 'it', 'en')",
+  "list_about": "Elenca tutti i libri nella tua libreria",
+  "config_about": "Gestisci la configurazione di Librius",
+  "config_init_help": "Inizializza un nuovo file di configurazione predefinito",
+  "config_print_help": "Stampa il file di configurazione corrente",
+  "config_edit_help": "Modifica il file di configurazione (editor predefinito: $EDITOR, o nano/vim/notepad)",
+  "config_editor_help": "Specifica l'editor da utilizzare (vim, nano o percorso personalizzato)",
+  "help_flag_about": "Mostra questo messaggio o l'aiuto dei sotto comandi",
+  "version_flag_about": "Mostra la versione"
 }
