@@ -40,14 +40,24 @@ pub fn build_cli() -> Command {
         .subcommand(
             Command::new("config")
                 .about(tr_s("config_about"))
-                .arg(Arg::new("init").long("init").help(tr_s("config_init_help")).action(clap::ArgAction::SetTrue))
+                .arg(
+                    Arg::new("init")
+                        .long("init")
+                        .help(tr_s("config_init_help"))
+                        .action(clap::ArgAction::SetTrue),
+                )
                 .arg(
                     Arg::new("print")
                         .long("print")
                         .help(tr_s("config_print_help"))
                         .action(clap::ArgAction::SetTrue),
                 )
-                .arg(Arg::new("edit").long("edit").help(tr_s("config_edit_help")).action(clap::ArgAction::SetTrue))
+                .arg(
+                    Arg::new("edit")
+                        .long("edit")
+                        .help(tr_s("config_edit_help"))
+                        .action(clap::ArgAction::SetTrue),
+                )
                 .arg(
                     Arg::new("editor")
                         .long("editor")
@@ -135,12 +145,26 @@ mod tests_cli {
         load_language("en");
         let mut cmd = build_cli();
         // Trova subcommand config
-        let sc = cmd.find_subcommand_mut("config").expect("subcommand config esiste");
+        let sc = cmd
+            .find_subcommand_mut("config")
+            .expect("subcommand config esiste");
         let mut help_buf: Vec<u8> = Vec::new();
         sc.write_help(&mut help_buf).expect("help scritto");
         let help = String::from_utf8(help_buf).unwrap();
-        assert!(!help.contains("<init>"), "--init non deve richiedere valore: {}", help);
-        assert!(!help.contains("<print>"), "--print non deve richiedere valore: {}", help);
-        assert!(!help.contains("<edit>"), "--edit non deve richiedere valore: {}", help);
+        assert!(
+            !help.contains("<init>"),
+            "--init non deve richiedere valore: {}",
+            help
+        );
+        assert!(
+            !help.contains("<print>"),
+            "--print non deve richiedere valore: {}",
+            help
+        );
+        assert!(
+            !help.contains("<edit>"),
+            "--edit non deve richiedere valore: {}",
+            help
+        );
     }
 }
