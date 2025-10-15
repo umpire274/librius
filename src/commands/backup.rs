@@ -5,7 +5,7 @@ use chrono::Local;
 use std::fs;
 use std::fs::File;
 use std::io::{self};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[cfg(target_os = "windows")]
 use std::io::Write;
@@ -16,7 +16,7 @@ use crate::utils::icons::ERR;
 #[cfg(not(target_os = "windows"))]
 use flate2::{Compression, write::GzEncoder};
 #[cfg(not(target_os = "windows"))]
-use tar::Builder as TarBuilder;
+use tar::Builder;
 
 pub fn handle_backup(_conn: &rusqlite::Connection, compress: bool) -> io::Result<()> {
     let fail_mess = tr("app.config.load_failed");
@@ -93,11 +93,17 @@ fn compress_zip(src: &PathBuf, dest_zip: &PathBuf) -> io::Result<()> {
 }
 
 #[cfg(not(target_os = "windows"))]
-fn compress_tar_gz(src: &PathBuf, dest_tar_gz: &PathBuf) -> io::Result<()> {
-    let tar_gz = File::create(dest_tar_gz)?;
-    let enc = GzEncoder::new(tar_gz, Compression::default());
-    let mut tar = TarBuilder::new(enc);
-    tar.append_path(src)?;
+pub fn compress_tar_gz(src_path: &Path, dest_path: &Path) -> io::Result<()> {
+    let tar_gz = File::create(dest_path)?;
+    let encoder = GzEncoder::new(tar_gz, Compression::default());
+    let mut tar = Builder::new(encoder);
+
+    // ✅ Usa solo il nome del file (relativo) dentro l’archivio
+    let file_name = src_path
+        .file_name()
+        .unwrap_or_else(|| std::ffi::OsStr::new("librius.db"));
+    tar.append_path_with_name(src_path, file_name)?;
+
     tar.finish()?;
     Ok(())
 }
