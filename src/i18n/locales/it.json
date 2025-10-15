@@ -73,5 +73,18 @@
   "export.json.ok": "Esportazione JSON completata: {path}",
   "export.xlsx.ok": "Esportazione XLSX completata: {path}",
   "export.json.error": "Errore durante l'esportazione JSON: {error}",
-  "export.xlsx.error": "Errore durante l'esportazione XLSX: {error}"
+  "export.xlsx.error": "Errore durante l'esportazione XLSX: {error}",
+  "import_about": "Importa i dati dei libri da file CSV o JSON",
+  "import_file_help": "Percorso del file da importare (obbligatorio)",
+  "import_csv_help": "Importa dati da un file CSV (predefinito)",
+  "import_json_help": "Importa dati da un file JSON",
+  "import.error.missing_file": "Percorso del file di input mancante.",
+  "import.csv.ok": "Importati {count} record dal file CSV.",
+  "import.json.ok": "Importati {count} record dal file JSON.",
+  "db.migrate.checking_isbn_index": "Verifica dell'indice univoco su ISBN...",
+  "db.migrate.isbn_index_exists": "L'indice univoco su ISBN esiste già.",
+  "db.migrate.isbn_index_created": "Creato indice univoco sulla colonna 'isbn'.",
+  "db.migrate.isbn_index_failed": "Errore nella creazione dell'indice univoco su ISBN: {error}",
+  "import.db.skipped_isbn": "ISBN duplicato saltato: {isbn}",
+  "log.import.completed": "Importazione completata, record totali: {count}"
 }

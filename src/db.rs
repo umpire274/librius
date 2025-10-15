@@ -59,21 +59,6 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
         [],
     )?;
 
-    // Log opening
-    let action = if db_exists { "DB_OPENED" } else { "DB_CREATED" };
-    let msg = if db_exists {
-        &tr_with(
-            "log.db.open",
-            &[("db_path", &db_path.display().to_string())],
-        )
-    } else {
-        &tr_with(
-            "log.db.create",
-            &[("db_path", &db_path.display().to_string())],
-        )
-    };
-    let _ = write_log(&conn, action, "DB", msg);
-
     // Initialize structure if missing
     if !db_exists {
         print_info(&tr("db.schema.initializing"), is_verbose());

@@ -1,5 +1,6 @@
 use crate::commands::{config::handle_config, list::handle_list};
-use crate::i18n::tr_s;
+use crate::i18n::{tr, tr_s};
+use crate::utils::print_err;
 use clap::{Arg, Command, Subcommand};
 use colored::Colorize;
 use rusqlite::Connection;
@@ -106,6 +107,31 @@ pub fn build_cli() -> Command {
                         .required(false),
                 ),
         )
+        .subcommand(
+            Command::new("import")
+                .about(tr_s("import_about"))
+                .arg(
+                    Arg::new("file")
+                        .short('f')
+                        .long("file")
+                        .help(tr_s("import_file_help"))
+                        .required(true)
+                        .value_name("PATH"),
+                )
+                .arg(
+                    Arg::new("csv")
+                        .long("csv")
+                        .help(tr_s("import_csv_help"))
+                        .action(clap::ArgAction::SetTrue),
+                )
+                .arg(
+                    Arg::new("json")
+                        .long("json")
+                        .help(tr_s("import_json_help"))
+                        .conflicts_with("csv")
+                        .action(clap::ArgAction::SetTrue),
+                ),
+        )
         // help come subcommand dedicato (es: `librius help config`)
         .subcommand(
             Command::new("help").about(tr_s("help_flag_about")).arg(
@@ -125,7 +151,7 @@ pub fn parse_cli() -> clap::ArgMatches {
 /// Esegue il comando selezionato
 pub fn run_cli(
     matches: &clap::ArgMatches,
-    conn: &Connection,
+    conn: &mut Connection,
 ) -> Result<(), Box<dyn std::error::Error>> {
     if let Some(("list", _)) = matches.subcommand() {
         handle_list(conn).unwrap_or_else(|e| {
@@ -163,6 +189,29 @@ pub fn run_cli(
             crate::commands::export::handle_export_xlsx(conn, output_path)?;
         } else if export_json {
             crate::commands::export::handle_export_json(conn, output_path)?;
+        }
+        Ok(())
+    } else if let Some(("import", sub_m)) = matches.subcommand() {
+        // 🔹 Recupera il percorso del file da importare
+        let file_path = sub_m.get_one::<String>("file").cloned();
+        if file_path.is_none() {
+            print_err(&tr("import.error.missing_file"));
+            return Ok(());
+        }
+
+        let file = file_path.unwrap();
+
+        // 🔹 Determina il formato (default CSV)
+        let _import_csv = sub_m.get_flag("csv");
+        let import_json = sub_m.get_flag("json");
+
+        // 🔹 Esegui l'import nel formato scelto
+        if import_json {
+            crate::commands::import::handle_import_json(conn, &file)
+                .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+        } else {
+            crate::commands::import::handle_import_csv(conn, &file)
+                .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
         }
         Ok(())
     } else if let Some(("help", sub_m)) = matches.subcommand() {

@@ -73,5 +73,18 @@
   "export.json.ok": "JSON export completed successfully: {path}",
   "export.xlsx.ok": "XLSX export completed successfully: {path}",
   "export.json.error": "Error while exporting to JSON: {error}",
-  "export.xlsx.error": "Error while exporting to XLSX: {error}"
+  "export.xlsx.error": "Error while exporting to XLSX: {error}",
+  "import_about": "Import book data from CSV or JSON files",
+  "import_file_help": "Path to the file to import (required)",
+  "import_csv_help": "Import data from a CSV file (default)",
+  "import_json_help": "Import data from a JSON file",
+  "import.error.missing_file": "Missing input file path.",
+  "import.csv.ok": "Imported {count} records from CSV file.",
+  "import.json.ok": "Imported {count} records from JSON file.",
+  "db.migrate.checking_isbn_index": "Checking for unique index on ISBN...",
+  "db.migrate.isbn_index_exists": "Unique ISBN index already exists.",
+  "db.migrate.isbn_index_created": "Created unique index on 'isbn' column.",
+  "db.migrate.isbn_index_failed": "Failed to create unique ISBN index: {error}",
+  "import.db.skipped_isbn": "Skipped duplicate ISBN: {isbn}",
+  "log.import.completed": "Import completed, total records: {count}"
 }
