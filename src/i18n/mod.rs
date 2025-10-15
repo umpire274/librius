@@ -1,49 +1,33 @@
-//! i18n - Internationalization module for Librius
-//!
-//! Provides language loading and translation lookup via JSON files.
-//! Supported languages are stored in `src/i18n/locales/`.
+//! i18n - Embedded Internationalization module for Librius
 
+use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use std::sync::RwLock;
 
-use once_cell::sync::Lazy;
-
 mod loader;
-use crate::utils::{is_verbose, print_info, print_warn};
-use loader::load_from_file;
+use loader::parse_json_to_map;
 
-/// Global translations map (language loaded at runtime)
+/// Global translation map
 static TRANSLATIONS: Lazy<RwLock<HashMap<String, String>>> =
     Lazy::new(|| RwLock::new(HashMap::new()));
 
-/// Loads a language file (e.g. "en", "it") from `src/i18n/locales/`.
-///
-/// If the requested language cannot be found, it falls back to English.
+/// Loads translations for the selected language (embedded JSON)
 pub fn load_language(lang_code: &str) {
     let mut map = TRANSLATIONS.write().unwrap();
     map.clear();
 
-    let lang_file = format!("src/i18n/locales/{}.json", lang_code);
-    match load_from_file(&lang_file) {
-        Ok(translations) => {
-            *map = translations;
-            print_info(
-                &tr_with("app.language.loaded", &[("lang", lang_code)]),
-                is_verbose(),
-            );
-        }
-        Err(_) => {
-            print_warn(&tr_with("app.language.not_found", &[("lang", lang_code)]));
-            if let Ok(fallback) = load_from_file("src/i18n/locales/en.json") {
-                *map = fallback;
-            }
-        }
-    }
+    // Select embedded JSON string
+    let content = match lang_code {
+        "it" => include_str!("locales/it.json"),
+        "en" => include_str!("locales/en.json"),
+        _ => include_str!("locales/en.json"),
+    };
+
+    // Parse JSON using shared helper
+    *map = parse_json_to_map(content).expect("Invalid embedded locale JSON");
 }
 
-/// Translates a given key using the loaded language map.
-///
-/// If the key is missing, returns the key itself.
+/// Returns the translation for the given key.
 pub fn tr(key: &str) -> String {
     TRANSLATIONS
         .read()
@@ -53,12 +37,12 @@ pub fn tr(key: &str) -> String {
         .unwrap_or_else(|| key.to_string())
 }
 
-// src/i18n/mod.rs
+/// Same as `tr`, but with runtime placeholder substitution.
 pub fn tr_with(key: &str, vars: &[(&str, &str)]) -> String {
     let mut s = tr(key);
     for (k, v) in vars {
-        let needle = format!("{{{}}}", k);
-        s = s.replace(&needle, v);
+        let placeholder = format!("{{{}}}", k);
+        s = s.replace(&placeholder, v);
     }
     s
 }

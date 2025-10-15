@@ -1,12 +1,22 @@
 use serde_json::Value;
 use std::collections::HashMap;
-use std::fs;
 use std::io;
 
-/// Loads a JSON translation file and returns a HashMap of key → value pairs.
-pub fn load_from_file(path: &str) -> io::Result<HashMap<String, String>> {
-    let data = fs::read_to_string(path)?;
-    let json: Value = serde_json::from_str(&data)?;
+/// Parses a JSON string and returns a HashMap of key → text pairs.
+/// Used for both embedded and (future) external locale loading.
+pub fn parse_json_to_map(content: &str) -> io::Result<HashMap<String, String>> {
+    // NOTE: For now Librius embeds all locales via `include_str!()`.
+    // If in the future external JSON files are reintroduced,
+    // implement a `load_from_file()` here using `fs::read_to_string()`.
+    //
+    // Example:
+    // pub fn load_from_file(path: &str) -> io::Result<HashMap<String, String>> {
+    //     let data = fs::read_to_string(path)?;
+    //     parse_json_to_map(&data)
+    // }
+
+    let json: Value =
+        serde_json::from_str(content).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
 
     let mut map = HashMap::new();
 
