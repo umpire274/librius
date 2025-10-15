@@ -4,9 +4,11 @@ use crate::utils::{print_err, print_ok};
 use chrono::Local;
 use std::fs;
 use std::fs::File;
-use std::io::{self, Write};
+use std::io::{self};
 use std::path::PathBuf;
 
+#[cfg(target_os = "windows")]
+use std::io::Write;
 #[cfg(target_os = "windows")]
 use zip::{CompressionMethod, ZipWriter, write::FileOptions};
 
