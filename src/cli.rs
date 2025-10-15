@@ -74,6 +74,38 @@ pub fn build_cli() -> Command {
                     .action(clap::ArgAction::SetTrue),
             ),
         )
+        .subcommand(
+            Command::new("export")
+                .about(tr_s("export_about"))
+                .arg(
+                    Arg::new("csv")
+                        .long("csv")
+                        .help(tr_s("export_csv_help"))
+                        .action(clap::ArgAction::SetTrue),
+                )
+                .arg(
+                    Arg::new("xlsx")
+                        .long("xlsx")
+                        .help(tr_s("export_xlsx_help"))
+                        .conflicts_with_all(["csv", "json"])
+                        .action(clap::ArgAction::SetTrue),
+                )
+                .arg(
+                    Arg::new("json")
+                        .long("json")
+                        .help(tr_s("export_json_help"))
+                        .conflicts_with_all(["csv", "xlsx"])
+                        .action(clap::ArgAction::SetTrue),
+                )
+                .arg(
+                    Arg::new("output")
+                        .short('o')
+                        .long("output")
+                        .help(tr_s("export_output_help"))
+                        .value_name("FILE")
+                        .required(false),
+                ),
+        )
         // help come subcommand dedicato (es: `librius help config`)
         .subcommand(
             Command::new("help").about(tr_s("help_flag_about")).arg(
@@ -117,6 +149,21 @@ pub fn run_cli(
         let compress = sub_m.get_flag("compress");
         // esegue backup plain o compresso (zip su Windows, tar.gz su Unix)
         crate::commands::backup::handle_backup(conn, compress)?;
+        Ok(())
+    } else if let Some(("export", sub_m)) = matches.subcommand() {
+        let output_path = sub_m.get_one::<String>("output").cloned();
+
+        let export_csv = sub_m.get_flag("csv");
+        let export_xlsx = sub_m.get_flag("xlsx");
+        let export_json = sub_m.get_flag("json");
+
+        if export_csv || (!export_xlsx && !export_json) {
+            crate::commands::export::handle_export_csv(conn, output_path)?;
+        } else if export_xlsx {
+            crate::commands::export::handle_export_xlsx(conn, output_path)?;
+        } else if export_json {
+            crate::commands::export::handle_export_json(conn, output_path)?;
+        }
         Ok(())
     } else if let Some(("help", sub_m)) = matches.subcommand() {
         if let Some(cmd_name) = sub_m.get_one::<String>("command") {

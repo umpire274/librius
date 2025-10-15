@@ -61,5 +61,17 @@
   "backup_compress_help": "Compress the backup (.zip on Windows, .tar.gz on Unix)",
   "backup.error.not_found": "Database file not found.",
   "backup.ok.plain": "Backup created at {path}",
-  "backup.ok.compressed": "Backup created and compressed at {path}"
+  "backup.ok.compressed": "Backup created and compressed at {path}",
+  "export_about": "Export data from your library",
+  "export_csv_about": "Export books to CSV format",
+  "export_output_help": "Optional output file path (default: auto timestamped)",
+  "export.csv.ok": "Data exported successfully to {path}",
+  "export.csv.error": "Failed to export data to CSV: {error}",
+  "export_csv_help": "Export data to CSV (default)",
+  "export_xlsx_help": "Export data to Excel XLSX format",
+  "export_json_help": "Export data to JSON format",
+  "export.json.ok": "JSON export completed successfully: {path}",
+  "export.xlsx.ok": "XLSX export completed successfully: {path}",
+  "export.json.error": "Error while exporting to JSON: {error}",
+  "export.xlsx.error": "Error while exporting to XLSX: {error}"
 }

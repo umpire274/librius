@@ -32,6 +32,8 @@ colored = "3.0.0"
 zip = { version = "6.0.0", optional = true }
 flate2 = { version = "1.1.4", optional = true }
 tar = { version = "0.4.44", optional = true }
+dirs = "6.0.0"
+umya-spreadsheet = "2.3.3"
 
 [target.'cfg(windows)'.dependencies]
 zip = "6.0.0"

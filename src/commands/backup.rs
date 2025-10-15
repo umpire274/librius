@@ -17,8 +17,8 @@ use flate2::{Compression, write::GzEncoder};
 use tar::Builder as TarBuilder;
 
 pub fn handle_backup(_conn: &rusqlite::Connection, compress: bool) -> io::Result<()> {
-    let fail_mess = &tr("app.config.load_failed");
-    let conf = config::load_or_init().expect(format!("{}{}", ERR, &fail_mess).as_str());
+    let fail_mess = tr("app.config.load_failed");
+    let conf = config::load_or_init().unwrap_or_else(|_| panic!("{}{}", ERR, fail_mess));
     let db_path = PathBuf::from(&conf.database);
 
     if !db_path.exists() {

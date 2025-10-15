@@ -6,4 +6,5 @@
 
 pub mod backup;
 pub mod config;
+pub mod export;
 pub mod list;
