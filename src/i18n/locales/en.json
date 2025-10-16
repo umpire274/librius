@@ -107,5 +107,8 @@
   "import.summary.failed": "Skipped {count} invalid records in '{file}'",
   "import.error.json_invalid": "Invalid JSON structure in '{file}': {error}",
   "import.summary.ok_json": "Imported {count} books from JSON file '{file}'",
-  "import.error.unexpected": "Unexpected error during import: {error}"
+  "import.error.unexpected": "Unexpected error during import: {error}",
+  "help.list.details": "Show all fields of the specified record (requires --id)",
+  "list.error.details_requires_id": "The --details flag can only be used together with --id <ID>.",
+  "help.list.id": "Specify the record ID to show"
 }

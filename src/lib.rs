@@ -73,7 +73,7 @@ mod tests {
 
         // Chiama la funzione handle_list per esercitare la logica di mapping e formattazione
         // default view in tests: non-short (full)
-        handle_list(&conn, false)?;
+        handle_list(&conn, false, None, false)?;
 
         Ok(())
     }
@@ -109,7 +109,7 @@ mod tests {
         )?;
 
         // Chiama la funzione handle_list per verificare la vista corta (non deve panicare)
-        handle_list(&conn, true)?;
+        handle_list(&conn, true, None, false)?;
 
         Ok(())
     }

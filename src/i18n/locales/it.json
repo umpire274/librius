@@ -107,5 +107,8 @@
   "import.summary.failed": "Saltati {count} record non validi in '{file}'",
   "import.error.json_invalid": "Struttura JSON non valida in '{file}': {error}",
   "import.summary.ok_json": "Importati {count} libri dal file JSON '{file}'",
-  "import.error.unexpected": "Errore imprevisto durante l'importazione: {error}"
+  "import.error.unexpected": "Errore imprevisto durante l'importazione: {error}",
+  "help.list.id": "Specifica l'ID del record da visualizzare",
+  "help.list.details": "Mostra tutti i campi del record specificato (richiede --id)",
+  "list.error.details_requires_id": "Il flag --details può essere usato solo insieme a --id <ID>."
 }

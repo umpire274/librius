@@ -6,7 +6,7 @@
 // =====================================================
 pub mod table;
 
-pub use table::build_table;
+pub use table::{build_table, build_vertical_table};
 
 use crate::i18n::tr_with;
 use chrono::Local;

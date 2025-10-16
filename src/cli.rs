@@ -3,7 +3,6 @@ use crate::i18n::{tr, tr_s};
 use crate::tr_with;
 use crate::utils::print_err;
 use clap::{Arg, Command, Subcommand};
-use colored::Colorize;
 use rusqlite::Connection;
 
 /// Costruisce la CLI localizzata usando le stringhe già caricate in memoria.
@@ -39,13 +38,30 @@ pub fn build_cli() -> Command {
                 .help(tr_s("help_lang")),
         )
         .subcommand(
-            Command::new("list").about(tr_s("list_about")).arg(
-                Arg::new("short")
-                    .long("short")
-                    .help(tr_s("help.list.short"))
-                    .action(clap::ArgAction::SetTrue)
-                    .num_args(0),
-            ),
+            Command::new("list")
+                .about(tr_s("list_about"))
+                .arg(
+                    Arg::new("short")
+                        .long("short")
+                        .help(tr_s("help.list.short"))
+                        .action(clap::ArgAction::SetTrue)
+                        .num_args(0),
+                )
+                .arg(
+                    Arg::new("id")
+                        .long("id")
+                        .help(tr_s("help.list.id")) // es: "Specify the record ID to show"
+                        .value_name("ID")
+                        .num_args(1)
+                        .value_parser(clap::value_parser!(i32)),
+                )
+                .arg(
+                    Arg::new("details")
+                        .long("details")
+                        .help(tr_s("help.list.details")) // es: "Show all fields of the specified record (requires --id)"
+                        .action(clap::ArgAction::SetTrue)
+                        .num_args(0),
+                ),
         )
         .subcommand(
             Command::new("config")
@@ -172,12 +188,11 @@ pub fn run_cli(
     matches: &clap::ArgMatches,
     conn: &mut Connection,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    if let Some(("list", sub_matches)) = matches.subcommand() {
-        let short = sub_matches.get_flag("short");
-
-        handle_list(conn, short).unwrap_or_else(|e| {
-            eprintln!("{} {}", "Error listing books:".red(), e);
-        });
+    if let Some(matches) = matches.subcommand_matches("list") {
+        let short = matches.get_flag("short");
+        let id = matches.get_one::<i32>("id").copied();
+        let details = matches.get_flag("details");
+        handle_list(conn, short, id, details)?;
         Ok(())
     } else if let Some(("config", sub_m)) = matches.subcommand() {
         let init = sub_m.get_flag("init");
