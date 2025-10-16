@@ -1,16 +1,3 @@
-//! Configuration utilities for Librius.
-//!
-//! This module contains types and helper functions to locate, create and load
-//! the YAML configuration file used by the application. The configuration is
-//! intentionally small: it currently only stores the path to the SQLite
-//! database file used by the CLI.
-//!
-//! The functions here are used by the binary at startup to ensure a
-//! deterministic configuration directory and to persist a default
-//! configuration when none exists.
-
-pub mod migrate;
-
 use serde::{Deserialize, Serialize};
 use serde_yaml::Value;
 use std::io::Write;

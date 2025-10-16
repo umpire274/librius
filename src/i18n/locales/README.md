@@ -20,7 +20,7 @@ Example:
 {
   "app.config.loading": "Loading configuration...",
   "db.init.ok": "Database created successfully.",
-  "book.add.fail": "Error adding book '{title}': {error}"
+  "book.add.fail": "Error adding models '{title}': {error}"
 }
 ```
 

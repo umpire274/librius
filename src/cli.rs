@@ -1,4 +1,4 @@
-use crate::commands::{config::handle_config, list::handle_list};
+use crate::commands::{handle_config, handle_list};
 use crate::i18n::{tr, tr_s};
 use crate::utils::print_err;
 use clap::{Arg, Command, Subcommand};
@@ -37,7 +37,15 @@ pub fn build_cli() -> Command {
                 .num_args(1)
                 .help(tr_s("help_lang")),
         )
-        .subcommand(Command::new("list").about(tr_s("list_about")))
+        .subcommand(
+            Command::new("list").about(tr_s("list_about")).arg(
+                Arg::new("short")
+                    .long("short")
+                    .help(tr_s("help.list.short"))
+                    .action(clap::ArgAction::SetTrue)
+                    .num_args(0),
+            ),
+        )
         .subcommand(
             Command::new("config")
                 .about(tr_s("config_about"))
@@ -153,8 +161,10 @@ pub fn run_cli(
     matches: &clap::ArgMatches,
     conn: &mut Connection,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    if let Some(("list", _)) = matches.subcommand() {
-        handle_list(conn).unwrap_or_else(|e| {
+    if let Some(("list", sub_matches)) = matches.subcommand() {
+        let short = sub_matches.get_flag("short");
+
+        handle_list(conn, short).unwrap_or_else(|e| {
             eprintln!("{} {}", "Error listing books:".red(), e);
         });
         Ok(())
@@ -174,7 +184,7 @@ pub fn run_cli(
     } else if let Some(("backup", sub_m)) = matches.subcommand() {
         let compress = sub_m.get_flag("compress");
         // esegue backup plain o compresso (zip su Windows, tar.gz su Unix)
-        crate::commands::backup::handle_backup(conn, compress)?;
+        crate::commands::handle_backup(conn, compress)?;
         Ok(())
     } else if let Some(("export", sub_m)) = matches.subcommand() {
         let output_path = sub_m.get_one::<String>("output").cloned();
@@ -184,11 +194,11 @@ pub fn run_cli(
         let export_json = sub_m.get_flag("json");
 
         if export_csv || (!export_xlsx && !export_json) {
-            crate::commands::export::handle_export_csv(conn, output_path)?;
+            crate::commands::handle_export_csv(conn, output_path)?;
         } else if export_xlsx {
-            crate::commands::export::handle_export_xlsx(conn, output_path)?;
+            crate::commands::handle_export_xlsx(conn, output_path)?;
         } else if export_json {
-            crate::commands::export::handle_export_json(conn, output_path)?;
+            crate::commands::handle_export_json(conn, output_path)?;
         }
         Ok(())
     } else if let Some(("import", sub_m)) = matches.subcommand() {
@@ -207,10 +217,10 @@ pub fn run_cli(
 
         // 🔹 Esegui l'import nel formato scelto
         if import_json {
-            crate::commands::import::handle_import_json(conn, &file)
+            crate::commands::handle_import_json(conn, &file)
                 .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
         } else {
-            crate::commands::import::handle_import_csv(conn, &file)
+            crate::commands::handle_import_csv(conn, &file)
                 .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
         }
         Ok(())

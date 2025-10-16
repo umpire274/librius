@@ -1,9 +1,12 @@
 // =====================================================
-// Librius - Utilities module
+// Librius - Utilities module (directory layout)
 // -----------------------------------------------------
 // Contiene funzioni di supporto generali e costanti
 // grafiche per output CLI.
 // =====================================================
+pub mod table;
+
+pub use table::build_table;
 
 use chrono::Local;
 use colored::*;

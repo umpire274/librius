@@ -86,5 +86,16 @@
   "db.migrate.isbn_index_created": "Created unique index on 'isbn' column.",
   "db.migrate.isbn_index_failed": "Failed to create unique ISBN index: {error}",
   "import.db.skipped_isbn": "Skipped duplicate ISBN: {isbn}",
-  "log.import.completed": "Import completed, total records: {count}"
+  "log.import.completed": "Import completed, total records: {count}",
+  "help.list.short": "Show only ID, Title, Author, Editor, and Year",
+  "list.header.id": "ID",
+  "list.header.title": "Title",
+  "list.header.author": "Author",
+  "list.header.editor": "Editor",
+  "list.header.year": "Year",
+  "list.header.language": "Language",
+  "list.header.room": "Room",
+  "list.header.shelf": "Shelf",
+  "list.header.position": "Position",
+  "list.header.added": "Added"
 }

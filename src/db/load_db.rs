@@ -1,16 +1,5 @@
-//! Database initialization utilities for Librius.
-//!
-//! This module provides a small helper to initialize (or open) the SQLite
-//! database used by the application. The `init_db` function ensures the
-//! required `books` table exists and returns an active `rusqlite::Connection`.
-//!
-//! The schema is intentionally simple and stores basic metadata for each
-//! book (title, author, year, isbn and a timestamp when the record was
-//! added).
-
-pub mod migrate;
-
 use crate::config::AppConfig;
+use crate::db::migrate_db;
 use crate::i18n::{tr, tr_with};
 use crate::utils::{is_verbose, print_err, print_info, print_ok, write_log};
 use rusqlite::{Connection, Result};
@@ -75,13 +64,13 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
     }
 
     // Apply migrations
-    match migrate::run_migrations(&conn) {
+    match migrate_db::run_migrations(&conn) {
         Err(e) => {
             print_err(&tr_with("db.migrate.failed", &[("error", &e.to_string())]));
             let _ = write_log(&conn, "DB_MIGRATION_FAIL", "DB", &e.to_string());
         }
         Ok(result) => match result {
-            migrate::MigrationResult::Applied(patches) => {
+            migrate_db::MigrationResult::Applied(patches) => {
                 print_ok(&tr("db.migrate.applied"), is_verbose());
                 let msg = &tr_with(
                     "log.db.patch_applied",
@@ -89,7 +78,7 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
                 );
                 let _ = write_log(&conn, "DB_MIGRATION_OK", "DB", msg);
             }
-            migrate::MigrationResult::None => {
+            migrate_db::MigrationResult::None => {
                 print_ok(&tr("db.schema.already_update"), is_verbose());
             }
         },
