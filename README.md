@@ -24,20 +24,24 @@ and import/export support.
 
 **🆕 Modern tabular output**
 
-- Replaced the old println! list format with the tabled crate.
+- Replaced the old `println!` list format with the [`tabled`](https://crates.io/crates/tabled) crate.
 - Tables now feature aligned, styled columns for improved readability.
-- Added a --short flag for compact view (ID, Title, Author, Editor, Year).
+- Added a `--short` flag for compact view (`ID`, `Title`, `Author`, `Editor`, `Year`).
+- Added `--id` and `--details` options to view a single record:
+    - `--id <ID>` shows a specific book by its ID.
+    - `--details` displays all fields of the selected record in a vertical table.
 
 **🧩 Modular architecture**
 
-- Standardized all modules using the mod.rs structure.
-- Each subsystem (commands, models, utils, db, config, i18n) now has a clean namespace.
-- Simplified imports using pub use re-exports in lib.rs.
+- Standardized all modules using the `mod.rs` structure.
+- Each subsystem (`commands`, `models`, `utils`, `db`, `config`, `i18n`) now has a clean, isolated namespace.
+- Simplified imports using `pub use` re-exports in `lib.rs`.
 
 **🧱 Utility improvements**
 
-- Added a reusable build_table() helper in utils/table.rs to ensure consistent table rendering.
-- Introduced BookFull and BookShort structs implementing Tabled for full and compact listings.
+- Added a reusable `build_table()` helper in `utils/table.rs` for consistent table rendering.
+- Introduced a dynamic `build_vertical_table()` helper for full record details using `serde_json` + `tabled`.
+- Implemented `BookFull` and `BookShort` structs implementing `Tabled` for both full and compact listings.
 
 ---
 
