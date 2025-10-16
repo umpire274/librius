@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2025-10-16
+
+### Added
+
+- Introduced the `tabled` crate (`v0.20.0`) for tabular output.
+- New `--short` flag for `librius list` showing only key columns (ID, Title, Author, Editor, Year).
+- New utility `build_table()` in `utils/table.rs` to render tables with consistent style and alignment.
+
+### Changed
+
+- Refactored `list` command to use `BookFull` and `BookShort` wrappers implementing `Tabled`.
+- Standardized module structure across the project:
+    - Each main directory (`commands`, `db`, `config`, `i18n`, `models`, `utils`) now includes a `mod.rs`.
+    - Unified import/export logic in `lib.rs` for cleaner module access.
+- Improved code readability, organization, and adherence to Rust idioms.
+
+### Removed
+
+- Legacy manual `println!` formatting for book listings.
+
+---
+
 ## [0.2.5] - 2025-10-15
 
 ### Added
