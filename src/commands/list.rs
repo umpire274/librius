@@ -54,7 +54,7 @@ pub fn handle_list(conn: &Connection, short: bool) -> Result<(), Box<dyn Error>>
     let books: Vec<Book> = rows.filter_map(|r| r.ok()).collect();
 
     if books.is_empty() {
-        println!("📚  {}", tr("list.no_books_found"));
+        println!("\n📚  {}", tr("list.no_books_found"));
         return Ok(());
     }
 

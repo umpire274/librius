@@ -1,5 +1,6 @@
 use crate::commands::{handle_config, handle_list};
 use crate::i18n::{tr, tr_s};
+use crate::tr_with;
 use crate::utils::print_err;
 use clap::{Arg, Command, Subcommand};
 use colored::Colorize;
@@ -138,6 +139,16 @@ pub fn build_cli() -> Command {
                         .help(tr_s("import_json_help"))
                         .conflicts_with("csv")
                         .action(clap::ArgAction::SetTrue),
+                )
+                .arg(
+                    Arg::new("delimiter")
+                        .short('d')
+                        .long("delimiter")
+                        .help(tr_s("import_delimiter_help"))
+                        .num_args(1)
+                        .value_name("CHAR")
+                        .required(false)
+                        .value_parser(clap::builder::NonEmptyStringValueParser::new()),
                 ),
         )
         // help come subcommand dedicato (es: `librius help config`)
@@ -215,14 +226,27 @@ pub fn run_cli(
         let _import_csv = sub_m.get_flag("csv");
         let import_json = sub_m.get_flag("json");
 
-        // 🔹 Esegui l'import nel formato scelto
-        if import_json {
-            crate::commands::handle_import_json(conn, &file)
-                .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+        // 🔹 Recupera delimitatore opzionale (solo CSV)
+        let delimiter_char = if let Some(delim_str) = sub_m.get_one::<String>("delimiter") {
+            delim_str.chars().next().unwrap_or(',')
         } else {
-            crate::commands::handle_import_csv(conn, &file)
-                .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+            ','
+        };
+
+        // 🔹 Esegui l’import nel formato corretto
+        let result = if import_json {
+            crate::commands::handle_import_json(conn, &file)
+        } else {
+            crate::commands::handle_import_csv(conn, &file, delimiter_char)
+        };
+
+        if let Err(e) = result {
+            print_err(&tr_with(
+                "import.error.unexpected",
+                &[("error", &e.to_string())],
+            ));
         }
+
         Ok(())
     } else if let Some(("help", sub_m)) = matches.subcommand() {
         if let Some(cmd_name) = sub_m.get_one::<String>("command") {

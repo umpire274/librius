@@ -97,5 +97,15 @@
   "list.header.room": "Room",
   "list.header.shelf": "Shelf",
   "list.header.position": "Position",
-  "list.header.added": "Added"
+  "list.header.added": "Added",
+  "list.no_books_found": "No books found in your library.",
+  "import_delimiter_help": "Specify CSV delimiter character (default ',')",
+  "import.error.open_failed": "Failed to open file '{file}': {error}",
+  "import.error.parse_failed": "Failed to parse record at line {line}: {error}",
+  "import.error.insert_failed": "Failed to insert '{title}' into the database: {error}",
+  "import.summary.ok": "Imported {count} books from '{file}' (delimiter '{delimiter}')",
+  "import.summary.failed": "Skipped {count} invalid records in '{file}'",
+  "import.error.json_invalid": "Invalid JSON structure in '{file}': {error}",
+  "import.summary.ok_json": "Imported {count} books from JSON file '{file}'",
+  "import.error.unexpected": "Unexpected error during import: {error}"
 }

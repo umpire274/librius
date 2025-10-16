@@ -16,6 +16,8 @@ use crate::utils::icons::ERR;
 #[cfg(not(target_os = "windows"))]
 use flate2::{Compression, write::GzEncoder};
 #[cfg(not(target_os = "windows"))]
+use std::path::Path;
+#[cfg(not(target_os = "windows"))]
 use tar::Builder;
 
 pub fn handle_backup(_conn: &rusqlite::Connection, compress: bool) -> io::Result<()> {

@@ -97,5 +97,15 @@
   "list.header.room": "Stanza",
   "list.header.shelf": "Scaffale",
   "list.header.position": "Posizione",
-  "list.header.added": "Aggiunto"
+  "list.header.added": "Aggiunto",
+  "list.no_books_found": "Nessun libro trovato.",
+  "import_delimiter_help": "Specifica il carattere delimitatore del file CSV (predefinito ',')",
+  "import.error.open_failed": "Impossibile aprire il file '{file}': {error}",
+  "import.error.parse_failed": "Errore di lettura alla riga {line}: {error}",
+  "import.error.insert_failed": "Impossibile inserire '{title}' nel database: {error}",
+  "import.summary.ok": "Importati {count} libri da '{file}' (delimitatore '{delimiter}')",
+  "import.summary.failed": "Saltati {count} record non validi in '{file}'",
+  "import.error.json_invalid": "Struttura JSON non valida in '{file}': {error}",
+  "import.summary.ok_json": "Importati {count} libri dal file JSON '{file}'",
+  "import.error.unexpected": "Errore imprevisto durante l'importazione: {error}"
 }

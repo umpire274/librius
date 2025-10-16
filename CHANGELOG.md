@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 - Introduced the `tabled` crate (`v0.20.0`) for tabular output.
 - New `--short` flag for `librius list` showing only key columns (ID, Title, Author, Editor, Year).
 - New utility `build_table()` in `utils/table.rs` to render tables with consistent style and alignment.
+- CLI option `--delimiter` / `-d` for `import` command.  
+  Allows specifying a custom CSV field separator (default: `,`).
 
 ### Changed
 
@@ -17,6 +19,21 @@ All notable changes to this project will be documented in this file.
     - Each main directory (`commands`, `db`, `config`, `i18n`, `models`, `utils`) now includes a `mod.rs`.
     - Unified import/export logic in `lib.rs` for cleaner module access.
 - Improved code readability, organization, and adherence to Rust idioms.
+
+### Refactored
+
+- Extracted duplicated import logic into reusable helper functions:
+    - `utils::open_import_file()` now handles file opening with localized error reporting.
+    - `utils::handle_import_result()` manages database insert results and counters.
+- Unified behavior between `handle_import_csv()` and `handle_import_json()`.
+- Simplified error handling and improved localization consistency across import operations.
+- Reduced code duplication and improved maintainability throughout the import module.
+
+### Fixed
+
+- **CSV/JSON import deserialization error**:  
+  The `id` field in the `Book` struct is now optional (`Option<i32>`),  
+  preventing missing-field errors during import when the ID column is not present.
 
 ### Removed
 

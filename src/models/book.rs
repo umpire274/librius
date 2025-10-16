@@ -6,7 +6,7 @@ use tabled::Tabled;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Book {
-    pub id: i64,
+    pub id: Option<i32>,
     pub title: String,
     pub author: String,
     pub editor: String,
@@ -38,7 +38,7 @@ impl<'a> Tabled for BookFull<'a> {
             .unwrap_or_else(|| "-".into());
 
         vec![
-            Cow::from(b.id.to_string()),
+            Cow::from(b.id.map(|v| v.to_string()).unwrap_or_default()),
             Cow::from(&b.title),
             Cow::from(&b.author),
             Cow::from(&b.editor),
@@ -73,7 +73,7 @@ impl<'a> Tabled for BookShort<'a> {
     fn fields(&self) -> Vec<Cow<'_, str>> {
         let b = self.0;
         vec![
-            Cow::from(b.id.to_string()),
+            Cow::from(b.id.map(|v| v.to_string()).unwrap_or_default()),
             Cow::from(&b.title),
             Cow::from(&b.author),
             Cow::from(&b.editor),
