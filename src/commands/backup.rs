@@ -5,7 +5,7 @@ use chrono::Local;
 use std::fs;
 use std::fs::File;
 use std::io::{self};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 #[cfg(target_os = "windows")]
 use std::io::Write;
@@ -15,6 +15,8 @@ use zip::{CompressionMethod, ZipWriter, write::FileOptions};
 use crate::utils::icons::ERR;
 #[cfg(not(target_os = "windows"))]
 use flate2::{Compression, write::GzEncoder};
+#[cfg(not(target_os = "windows"))]
+use std::path::Path;
 #[cfg(not(target_os = "windows"))]
 use tar::Builder;
 

@@ -1,86 +1,119 @@
-//! `list` command implementation.
-//!
-//! This module contains the handler used by the CLI to list all books stored
-//! in the database. The function performs a simple SELECT query and prints
-//! a human-readable list to standard output using colored formatting.
-
+use crate::book::{Book, BookFull, BookShort};
 use crate::i18n::tr;
-use crate::models::Book;
+use crate::utils::{build_table, build_vertical_table, print_err};
 use chrono::{DateTime, NaiveDateTime, Utc};
-use colored::*;
-use rusqlite::Connection;
+use rusqlite::types::ToSql;
+use rusqlite::{Connection, Row};
 use std::error::Error;
 
 fn parse_added_at(s: &str) -> Option<DateTime<Utc>> {
-    // Try RFC3339 first
     if let Ok(dt) = DateTime::parse_from_rfc3339(s) {
         return Some(dt.with_timezone(&Utc));
     }
-    // Try SQLite default format: "YYYY-MM-DD HH:MM:SS"
     if let Ok(naive) = NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S") {
         return Some(DateTime::from_naive_utc_and_offset(naive, Utc));
     }
-    // Try with fractional seconds
     if let Ok(naive) = NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S%.f") {
         return Some(DateTime::from_naive_utc_and_offset(naive, Utc));
     }
-
     None
+}
+
+// Helper to map a rusqlite::Row into a Book instance.
+fn row_to_book(row: &Row) -> rusqlite::Result<Book> {
+    let added_at_str: Option<String> = row.get("added_at")?;
+    let parsed_added_at = added_at_str.as_deref().and_then(parse_added_at);
+
+    Ok(Book {
+        id: row.get("id")?,
+        title: row.get("title")?,
+        author: row.get("author")?,
+        editor: row.get("editor")?,
+        year: row.get("year")?,
+        isbn: row.get("isbn")?,
+        language: row.get("language")?,
+        pages: row.get("pages")?,
+        genre: row.get("genre")?,
+        summary: row.get("summary")?,
+        room: row.get("room")?,
+        shelf: row.get("shelf")?,
+        row: row.get("row")?,
+        position: row.get("position")?,
+        added_at: parsed_added_at,
+    })
 }
 
 /// Handle the `list` subcommand.
 ///
-/// The handler queries the `books` table and prints each record to stdout in
-/// a compact, colored format. Errors from SQL preparation or iteration are
-/// returned to the caller so the binary can decide how to report them.
-pub fn handle_list(conn: &Connection) -> Result<(), Box<dyn Error>> {
-    let mut stmt = conn
-        .prepare("SELECT id, title, author, editor, year, isbn, language, pages, genre, summary, room, shelf, row, position, added_at FROM books ORDER BY id;")?;
-    let rows = stmt.query_map([], |row| {
-        // Read added_at as an optional string, then parse to DateTime<Utc>
-        let added_at_str: Option<String> = row.get("added_at")?;
-        let parsed_added_at = match added_at_str {
-            Some(ref s) => parse_added_at(s),
-            None => None,
+/// Lists all books from the database using localized tabular output.
+/// Supports the `--short` flag for compact view.
+pub fn handle_list(
+    conn: &Connection,
+    _short: bool,
+    id: Option<i32>,
+    _details: bool,
+) -> Result<(), Box<dyn Error>> {
+    // If user asked for details without specifying an id, show a localized
+    // error message and do not display the list.
+    if _details && id.is_none() {
+        println!();
+        print_err(&tr("list.error.details_requires_id"));
+        return Ok(());
+    }
+
+    // Build base query and optionally filter by id if provided
+    let base_query = "SELECT id, title, author, editor, year, isbn, language, pages, genre, summary, room, shelf, row, position, added_at FROM books";
+    let query = if id.is_some() {
+        format!("{} WHERE id = ?1 ORDER BY id;", base_query)
+    } else {
+        format!("{} ORDER BY id;", base_query)
+    };
+
+    let mut stmt = conn.prepare(&query)?;
+    let mut books: Vec<Book> = Vec::new();
+
+    // Build owned params: store boxed ToSql trait objects so ownership is
+    // guaranteed and we can build a slice of `&dyn ToSql` for the query.
+    let mut params_owned: Vec<Box<dyn ToSql>> = Vec::new();
+    if let Some(v) = id {
+        params_owned.push(Box::new(v));
+    }
+    // Create a slice of references to pass to rusqlite
+    let params_refs: Vec<&dyn ToSql> = params_owned
+        .iter()
+        .map(|b| b.as_ref() as &dyn ToSql)
+        .collect();
+
+    let mapped = stmt.query_map(params_refs.as_slice(), row_to_book)?;
+    for r in mapped {
+        books.push(r?);
+    }
+
+    if books.is_empty() {
+        if let Some(book_id) = id {
+            println!("⚠️  No book found with ID {book_id}");
+        } else {
+            println!("\n📚  {}", tr("list.no_books_found"));
+        }
+        return Ok(());
+    }
+
+    // If an ID was requested, show detailed vertical view for that specific record.
+    if id.is_some() {
+        let book = &books[0];
+        println!("\n📖  {} {:?}\n", tr("list.book_details_for_id"), book.id);
+        build_vertical_table(book);
+    } else {
+        // Otherwise show the list (short or full)
+        println!("\n{}\n", tr("app.library.info"));
+
+        let table = if _short {
+            build_table(books.iter().map(BookShort))
+        } else {
+            build_table(books.iter().map(BookFull))
         };
 
-        Ok(Book {
-            id: row.get("id")?,
-            title: row.get("title")?,
-            author: row.get("author")?,
-            editor: row.get("editor")?,
-            year: row.get("year")?,
-            isbn: row.get("isbn")?,
-            language: row.get("language")?,
-            pages: row.get("pages")?,
-            genre: row.get("genre")?,
-            summary: row.get("summary")?,
-            room: row.get("room")?,
-            shelf: row.get("shelf")?,
-            row: row.get("row")?,
-            position: row.get("position")?,
-            added_at: parsed_added_at,
-        })
-    })?;
-
-    println!("\n{}", &tr("app.library.info").bold().green());
-    for b in rows {
-        let b = b?;
-        // Format added_at as YYYY-MM-DD when present
-        let added_date = b
-            .added_at
-            .as_ref()
-            .map(|d| d.format("%Y-%m-%d").to_string())
-            .unwrap_or_else(|| "-".to_string());
-
-        println!(
-            "{}. {} ({:?}) [{}] [{}]",
-            b.id.to_string().blue(),
-            b.title.bold(),
-            b.author,
-            b.year,
-            added_date
-        );
+        println!("{}", table);
     }
 
     Ok(())

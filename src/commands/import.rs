@@ -1,134 +1,155 @@
 use crate::i18n::tr_with;
-use crate::utils::{is_verbose, print_info, print_ok, write_log};
-use rusqlite::{Connection, Transaction};
-use serde::Deserialize;
-use std::fs::File;
-use std::io;
-
+use crate::utils::{is_verbose, print_ok};
+use crate::{Book, print_err};
 use csv::ReaderBuilder;
-
-/// Struttura dati comune per importazione (CSV/JSON)
-#[derive(Debug, Deserialize)]
-pub struct BookRecord {
-    pub title: String,
-    pub author: String,
-    pub editor: String,
-    pub year: i64,
-    pub isbn: String,
-    pub language: Option<String>,
-    pub pages: Option<i64>,
-    pub genre: Option<String>,
-    pub summary: Option<String>,
-    pub room: Option<String>,
-    pub shelf: Option<String>,
-    pub row: Option<String>,
-    pub position: Option<String>,
-}
-
-/// Funzione helper per convertire errori in `io::Error`
-fn to_io<E: std::fmt::Display>(err: E) -> io::Error {
-    io::Error::other(err.to_string())
-}
-
-/// 🧩 Helper: inserisce un record nella tabella `books`, gestendo i duplicati via OR IGNORE.
-/// Ritorna `true` se il record è stato inserito, `false` se saltato (duplicato).
-fn insert_book_record(tx: &Transaction, rec: &BookRecord) -> io::Result<bool> {
-    let affected = tx
-        .execute(
-            "INSERT OR IGNORE INTO books (title, author, editor, year, isbn, language, pages, genre, summary, room, shelf, row, position)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
-            (
-                &rec.title,
-                &rec.author,
-                &rec.editor,
-                &rec.year,
-                &rec.isbn,
-                &rec.language,
-                &rec.pages,
-                &rec.genre,
-                &rec.summary,
-                &rec.room,
-                &rec.shelf,
-                &rec.row,
-                &rec.position,
-            ),
-        )
-        .map_err(to_io)?;
-
-    Ok(affected > 0)
-}
+use rusqlite::Connection;
+use std::io::BufReader;
 
 /// 🧩 Importa dati da file CSV (usa `csv` + `serde`)
-pub fn handle_import_csv(conn: &mut Connection, file_path: &str) -> io::Result<()> {
+pub fn handle_import_csv(
+    conn: &mut Connection,
+    file: &str,
+    delimiter: char,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let file_display = file.to_string();
+
+    // ✅ Attempt to open the file
+    let file_handle = crate::utils::open_import_file(file)?;
+
+    // ✅ Build CSV reader
     let mut reader = ReaderBuilder::new()
-        .delimiter(b';')
-        .from_path(file_path)
-        .map_err(to_io)?;
+        .delimiter(delimiter as u8)
+        .from_reader(file_handle);
 
-    let tx = conn.transaction().map_err(to_io)?;
-    let mut inserted = 0;
+    let mut imported = 0;
+    let mut failed = 0;
 
-    for result in reader.deserialize() {
-        let rec: BookRecord = result.map_err(to_io)?;
-        let inserted_ok = insert_book_record(&tx, &rec)?;
-        if inserted_ok {
-            inserted += 1;
-        } else if is_verbose() {
-            print_info(
-                &tr_with("import.db.skipped_isbn", &[("isbn", &rec.isbn)]),
-                is_verbose(),
-            );
+    // ✅ Read and process each record
+    for (index, record) in reader.deserialize::<Book>().enumerate() {
+        match record {
+            Ok(book) => {
+                let result = conn.execute(
+                    "INSERT INTO books (title, author, editor, year, isbn, genre, language, pages, summary)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+                    (
+                        &book.title,
+                        &book.author,
+                        &book.editor,
+                        &book.year,
+                        &book.isbn,
+                        &book.genre,
+                        &book.language,
+                        &book.pages,
+                        &book.summary,
+                    ),
+                );
+
+                crate::utils::handle_import_result(
+                    &result,
+                    &mut imported,
+                    &mut failed,
+                    &book.title,
+                );
+            }
+            Err(e) => {
+                failed += 1;
+                print_err(&tr_with(
+                    "import.error.parse_failed",
+                    &[("line", &index.to_string()), ("error", &e.to_string())],
+                ));
+            }
         }
     }
 
-    tx.commit().map_err(to_io)?;
-    print_ok(
-        &tr_with("import.csv.ok", &[("count", &inserted.to_string())]),
-        true,
-    );
-    write_log(
-        conn,
-        "IMPORT_CSV_COMPLETED",
-        "DB",
-        &tr_with("log.import.completed", &[("count", &inserted.to_string())]),
-    )
-    .map_err(to_io)?;
+    // ✅ Summary message
+    if imported > 0 {
+        print_ok(
+            &tr_with(
+                "import.summary.ok",
+                &[
+                    ("count", &imported.to_string()),
+                    ("file", &file_display),
+                    ("delimiter", &delimiter.to_string()),
+                ],
+            ),
+            is_verbose(),
+        );
+    }
+
+    if failed > 0 {
+        print_err(&tr_with(
+            "import.summary.failed",
+            &[("count", &failed.to_string()), ("file", &file_display)],
+        ));
+    }
+
     Ok(())
 }
 
-/// 🧩 Importa dati da file JSON (usa `serde_json`)
-pub fn handle_import_json(conn: &mut Connection, file_path: &str) -> io::Result<()> {
-    let file = File::open(file_path).map_err(to_io)?;
-    let data: Vec<BookRecord> = serde_json::from_reader(file)
-        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
+/// Handles importing a JSON file into the database.
+/// Expects a top-level array of book objects.
+pub fn handle_import_json(
+    conn: &mut Connection,
+    file: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let file_display = file.to_string();
 
-    let tx = conn.transaction().map_err(to_io)?;
-    let mut inserted = 0;
+    // ✅ Open JSON file
+    let file_handle = crate::utils::open_import_file(file)?;
 
-    for rec in data {
-        let inserted_ok = insert_book_record(&tx, &rec)?;
-        if inserted_ok {
-            inserted += 1;
-        } else if is_verbose() {
-            print_info(
-                &tr_with("import.db.skipped_isbn", &[("isbn", &rec.isbn)]),
-                is_verbose(),
-            );
+    let reader = BufReader::new(file_handle);
+    let books: Vec<Book> = match serde_json::from_reader(reader) {
+        Ok(data) => data,
+        Err(e) => {
+            print_err(&tr_with(
+                "import.error.json_invalid",
+                &[("file", &file_display), ("error", &e.to_string())],
+            ));
+            return Ok(());
         }
+    };
+
+    let mut imported = 0;
+    let mut failed = 0;
+
+    // ✅ Iterate through records
+    for book in books {
+        let result = conn.execute(
+            "INSERT INTO books (title, author, editor, year, isbn, genre, language, pages, summary)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+            (
+                &book.title,
+                &book.author,
+                &book.editor,
+                &book.year,
+                &book.isbn,
+                &book.genre,
+                &book.language,
+                &book.pages,
+                &book.summary,
+            ),
+        );
+
+        crate::utils::handle_import_result(&result, &mut imported, &mut failed, &book.title);
     }
 
-    tx.commit().map_err(to_io)?;
-    print_ok(
-        &tr_with("import.json.ok", &[("count", &inserted.to_string())]),
-        true,
-    );
-    write_log(
-        conn,
-        "IMPORT_JSON_COMPLETED",
-        "DB",
-        &tr_with("log.import.completed", &[("count", &inserted.to_string())]),
-    )
-    .map_err(to_io)?;
+    // ✅ Summary output
+    if imported > 0 {
+        print_ok(
+            &tr_with(
+                "import.summary.ok_json",
+                &[("count", &imported.to_string()), ("file", &file_display)],
+            ),
+            is_verbose(),
+        );
+    }
+
+    if failed > 0 {
+        print_err(&tr_with(
+            "import.summary.failed",
+            &[("count", &failed.to_string()), ("file", &file_display)],
+        ));
+    }
 
     Ok(())
 }

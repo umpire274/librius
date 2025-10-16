@@ -1,8 +1,8 @@
-use crate::commands::{config::handle_config, list::handle_list};
+use crate::commands::{handle_config, handle_list};
 use crate::i18n::{tr, tr_s};
+use crate::tr_with;
 use crate::utils::print_err;
 use clap::{Arg, Command, Subcommand};
-use colored::Colorize;
 use rusqlite::Connection;
 
 /// Costruisce la CLI localizzata usando le stringhe già caricate in memoria.
@@ -37,7 +37,32 @@ pub fn build_cli() -> Command {
                 .num_args(1)
                 .help(tr_s("help_lang")),
         )
-        .subcommand(Command::new("list").about(tr_s("list_about")))
+        .subcommand(
+            Command::new("list")
+                .about(tr_s("list_about"))
+                .arg(
+                    Arg::new("short")
+                        .long("short")
+                        .help(tr_s("help.list.short"))
+                        .action(clap::ArgAction::SetTrue)
+                        .num_args(0),
+                )
+                .arg(
+                    Arg::new("id")
+                        .long("id")
+                        .help(tr_s("help.list.id")) // es: "Specify the record ID to show"
+                        .value_name("ID")
+                        .num_args(1)
+                        .value_parser(clap::value_parser!(i32)),
+                )
+                .arg(
+                    Arg::new("details")
+                        .long("details")
+                        .help(tr_s("help.list.details")) // es: "Show all fields of the specified record (requires --id)"
+                        .action(clap::ArgAction::SetTrue)
+                        .num_args(0),
+                ),
+        )
         .subcommand(
             Command::new("config")
                 .about(tr_s("config_about"))
@@ -130,6 +155,16 @@ pub fn build_cli() -> Command {
                         .help(tr_s("import_json_help"))
                         .conflicts_with("csv")
                         .action(clap::ArgAction::SetTrue),
+                )
+                .arg(
+                    Arg::new("delimiter")
+                        .short('d')
+                        .long("delimiter")
+                        .help(tr_s("import_delimiter_help"))
+                        .num_args(1)
+                        .value_name("CHAR")
+                        .required(false)
+                        .value_parser(clap::builder::NonEmptyStringValueParser::new()),
                 ),
         )
         // help come subcommand dedicato (es: `librius help config`)
@@ -153,10 +188,11 @@ pub fn run_cli(
     matches: &clap::ArgMatches,
     conn: &mut Connection,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    if let Some(("list", _)) = matches.subcommand() {
-        handle_list(conn).unwrap_or_else(|e| {
-            eprintln!("{} {}", "Error listing books:".red(), e);
-        });
+    if let Some(matches) = matches.subcommand_matches("list") {
+        let short = matches.get_flag("short");
+        let id = matches.get_one::<i32>("id").copied();
+        let details = matches.get_flag("details");
+        handle_list(conn, short, id, details)?;
         Ok(())
     } else if let Some(("config", sub_m)) = matches.subcommand() {
         let init = sub_m.get_flag("init");
@@ -174,7 +210,7 @@ pub fn run_cli(
     } else if let Some(("backup", sub_m)) = matches.subcommand() {
         let compress = sub_m.get_flag("compress");
         // esegue backup plain o compresso (zip su Windows, tar.gz su Unix)
-        crate::commands::backup::handle_backup(conn, compress)?;
+        crate::commands::handle_backup(conn, compress)?;
         Ok(())
     } else if let Some(("export", sub_m)) = matches.subcommand() {
         let output_path = sub_m.get_one::<String>("output").cloned();
@@ -184,11 +220,11 @@ pub fn run_cli(
         let export_json = sub_m.get_flag("json");
 
         if export_csv || (!export_xlsx && !export_json) {
-            crate::commands::export::handle_export_csv(conn, output_path)?;
+            crate::commands::handle_export_csv(conn, output_path)?;
         } else if export_xlsx {
-            crate::commands::export::handle_export_xlsx(conn, output_path)?;
+            crate::commands::handle_export_xlsx(conn, output_path)?;
         } else if export_json {
-            crate::commands::export::handle_export_json(conn, output_path)?;
+            crate::commands::handle_export_json(conn, output_path)?;
         }
         Ok(())
     } else if let Some(("import", sub_m)) = matches.subcommand() {
@@ -205,14 +241,27 @@ pub fn run_cli(
         let _import_csv = sub_m.get_flag("csv");
         let import_json = sub_m.get_flag("json");
 
-        // 🔹 Esegui l'import nel formato scelto
-        if import_json {
-            crate::commands::import::handle_import_json(conn, &file)
-                .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+        // 🔹 Recupera delimitatore opzionale (solo CSV)
+        let delimiter_char = if let Some(delim_str) = sub_m.get_one::<String>("delimiter") {
+            delim_str.chars().next().unwrap_or(',')
         } else {
-            crate::commands::import::handle_import_csv(conn, &file)
-                .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+            ','
+        };
+
+        // 🔹 Esegui l’import nel formato corretto
+        let result = if import_json {
+            crate::commands::handle_import_json(conn, &file)
+        } else {
+            crate::commands::handle_import_csv(conn, &file, delimiter_char)
+        };
+
+        if let Err(e) = result {
+            print_err(&tr_with(
+                "import.error.unexpected",
+                &[("error", &e.to_string())],
+            ));
         }
+
         Ok(())
     } else if let Some(("help", sub_m)) = matches.subcommand() {
         if let Some(cmd_name) = sub_m.get_one::<String>("command") {

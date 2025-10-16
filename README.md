@@ -20,35 +20,28 @@ and import/export support.
 
 ---
 
-## ✨ New in v0.2.5
+## ✨ New in v0.3.0
 
-- **Backup command** (`librius backup`)
-    - Creates plain `.sqlite` backups in the `backups/` directory
-    - Optional `--compress` flag for compressed backups
-        - `.zip` format on Windows
-        - `.tar.gz` format on macOS and Linux
-    - Localized help and messages via i18n (English and Italian)
-    - Timestamp-based file naming for safe sequential backups
+**🆕 Modern tabular output**
 
-- **Export command** (`librius export`)
-    - Added support for exporting library data in multiple formats:
-        - `--csv` (default): plain text export with semicolon delimiter
-        - `--json`: structured JSON array output
-        - `--xlsx`: formatted Excel file using umya-spreadsheet
-    - Localized CLI help and status messages (English/Italian)
-    - Automatic export directory and timestamped filenames
-    - Uses `dirs` crate for cross-platform export path handling
+- Replaced the old `println!` list format with the [`tabled`](https://crates.io/crates/tabled) crate.
+- Tables now feature aligned, styled columns for improved readability.
+- Added a `--short` flag for compact view (`ID`, `Title`, `Author`, `Editor`, `Year`).
+- Added `--id` and `--details` options to view a single record:
+    - `--id <ID>` shows a specific book by its ID.
+    - `--details` displays all fields of the selected record in a vertical table.
 
-- **Import command** (`librius import`)
-    - Supports importing book data from external sources
-    - Available formats:
-        - `--csv` (default): semicolon-delimited CSV
-        - `--json`: JSON array of objects
-    - Unified parsing via `serde` and shared `BookRecord` struct
-    - Duplicate detection through unique index on `isbn`
-    - Uses `INSERT OR IGNORE` for idempotent imports (no duplication)
-    - Verbose mode logs skipped records (e.g., “Skipped duplicate ISBN: …”)
-    - Non-blocking import completion logging
+**🧩 Modular architecture**
+
+- Standardized all modules using the `mod.rs` structure.
+- Each subsystem (`commands`, `models`, `utils`, `db`, `config`, `i18n`) now has a clean, isolated namespace.
+- Simplified imports using `pub use` re-exports in `lib.rs`.
+
+**🧱 Utility improvements**
+
+- Added a reusable `build_table()` helper in `utils/table.rs` for consistent table rendering.
+- Introduced a dynamic `build_vertical_table()` helper for full record details using `serde_json` + `tabled`.
+- Implemented `BookFull` and `BookShort` structs implementing `Tabled` for both full and compact listings.
 
 ---
 
@@ -94,12 +87,36 @@ cargo install rtimelogger
 |   ✅    | **Import**               | Import data from CSV or JSON files (duplicate-safe via ISBN)                |
 |   ✅    | **Database migrations**  | Automatic schema upgrades at startup                                        |
 |   ✅    | **Logging system**       | Records operations and migrations in log table                              |
-|   ✅    | **Verbose mode**         | Optional `--verbose` flag for detailed debug output                         |
-|   ✅    | **Safe patch system**    | Each migration is idempotent and logged for traceability                    |
 |   ✅    | **Multilanguage (i18n)** | Localized CLI (commands, help); embedded JSON; `--lang` + YAML `language`   |
 |   🚧   | **Add / Remove**         | Add or delete books via CLI commands                                        |
 |   🚧   | **Search**               | Search by title, author, or ISBN                                            |
-|   🚧   | **Export / Import**      | Export and import data (JSON, CSV)                                          |
+
+---
+
+## 💻 Usage
+
+```bash
+librius list          # Full detailed list
+librius list --short  # Compact list (ID, Title, Author, Editor, Year)
+``` 
+
+---
+
+## 🧱 Example output
+
+```bash
+$ librius list --short
+
+📚  Personal Library
+════════════════════════════════════════════════════════════════════════════════
+
+┌────┬──────────────────────────────┬────────────────────┬──────────────┬──────┐
+│ ID │ Title                        │ Author             │ Editor       │ Year │
+├────┼──────────────────────────────┼────────────────────┼──────────────┼──────┤
+│ 1  │ The Rust Programming Language│ Steve Klabnik      │ No Starch    │ 2018 │
+│ 2  │ Clean Code                   │ Robert C. Martin   │ Pearson      │ 2008 │
+└────┴──────────────────────────────┴────────────────────┴──────────────┴──────┘
+```
 
 ---
 
@@ -122,7 +139,7 @@ Librius now supports a multilingual interface.
 - All user-visible messages (print_info, print_err, etc.) are translated dynamically.
 - Missing keys automatically fall back to their key name or English equivalent.
 
-### Example usage
+### Example Usage
 
 ```bash
 # Default (English)
@@ -167,6 +184,51 @@ Variables can be inserted at runtime:
 
 ```rust
 tr_with("db.path.open_existing", & [("path", & db_path)]);
+```
+
+---
+
+## 🧱 Project structure
+
+```
+src/
+├─ main.rs
+├─ lib.rs
+├─ cli.rs
+│
+├─ commands/
+│   ├─ mod.rs
+│   ├─ list.rs
+│   ├─ backup.rs
+│   ├─ config.rs
+│   ├─ export.rs
+│   └─ import.rs
+│
+├─ config/
+│   ├─ mod.rs
+│   ├─ load_config.rs
+│   └─ migrate_config.rs
+│
+├─ db/
+│   ├─ mod.rs
+│   ├─ load_db.rs
+│   └─ migrate_db.rs
+│
+├─ i18n/
+│   ├─ mod.rs
+│   ├─ loader.rs
+│   └─ locales/
+│       ├─ en.json
+│       ├─ it.json
+│       └─ README.md
+│
+├─ models/
+│   ├─ mod.rs
+│   └─ book.rs
+│
+└─ utils/
+    ├─ mod.rs
+    └─ table.rs
 ```
 
 ---
@@ -266,6 +328,22 @@ language: "en"
 - Default path:
     - macOS/Linux → $HOME/.librius/librius.conf
     - Windows → %APPDATA%\Roaming\librius\librius.conf
+
+---
+
+## 🧩 Development notes
+
+Librius now follows a standard Rust modular structure:
+
+- Each domain (commands, db, config, models, utils, i18n) exposes its API via mod.rs.
+- Common utilities like build_table() are reused across commands for consistent output.
+- The lib.rs re-exports all major modules for cleaner imports in main.rs.
+
+### Example import
+
+```rust
+use librius::{build_cli, handle_list; tr};
+```
 
 ---
 
