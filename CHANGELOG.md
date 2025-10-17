@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.5] - 2025-10-17
+
+### Added
+
+- Introduced official **Librius icon and branding assets**
+    - Added `librius.svg`, `librius.png`, and `librius.ico` in `res/`
+    - Included build integration for Windows executables
+- Prepared cross-platform structure for future GUI integration
+
+### Changed
+
+- Updated documentation and README with new logo and asset references
+
+---
+
 ## [0.3.0] - 2025-10-16
 
 ### Added
