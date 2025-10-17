@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2025-10-18
+
+### Added
+
+- New command `add book`:
+    - Fetches book information automatically from the Google Books API using ISBN.
+    - Populates title, author, editor, year, language, genre, and summary automatically.
+    - Fallback to interactive mode (planned) for books not found.
+- Integrated dynamic i18n support for all CLI help messages (`add`, `book`, `isbn`).
+- Added automatic language name resolution (e.g., `"it"` → `"Italian"`).
+- New utility module `utils/lang.rs` for ISO 639-1 to language name conversion.
+- Localized console messages for book lookup and insertion results.
+
+### Changed
+
+- Modularized command structure: added `add.rs` and `add_book.rs` under `src/commands/`.
+- Improved error handling for Google Books API responses and JSON decoding.
+- Replaced manual `impl Default` blocks with idiomatic `#[derive(Default)]`.
+
+### Fixed
+
+- Deserialization issues with Google Books API fields (`volumeInfo`, `publishedDate`, `pageCount`).
+- Empty fields on insertion caused by incorrect field mapping.
+
+### Example usage
+
+```bash
+$ librius add book --isbn 9788820382698
+🔍 Ricerca del libro con ISBN: 9788820382698
+📘 Libro trovato: “La lingua dell'antico Egitto” — Emanuele M. Ciampini (2018)
+✅ Libro “La lingua dell'antico Egitto” aggiunto con successo.
+
+```
+
+---
+
 ## [0.3.5] - 2025-10-17
 
 ### Added

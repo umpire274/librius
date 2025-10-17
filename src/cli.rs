@@ -167,6 +167,17 @@ pub fn build_cli() -> Command {
                         .value_parser(clap::builder::NonEmptyStringValueParser::new()),
                 ),
         )
+        .subcommand(
+            Command::new("add").about(tr("help.add.about")).subcommand(
+                Command::new("book").about(tr("help.add.book.about")).arg(
+                    Arg::new("isbn")
+                        .long("isbn")
+                        .help(tr("help.add.book.isbn"))
+                        .required(true)
+                        .value_name("ISBN"),
+                ),
+            ),
+        )
         // help come subcommand dedicato (es: `librius help config`)
         .subcommand(
             Command::new("help").about(tr_s("help_flag_about")).arg(
@@ -262,6 +273,15 @@ pub fn run_cli(
             ));
         }
 
+        Ok(())
+    } else if let Some(("add", sub_m)) = matches.subcommand() {
+        if let Some(("book", book_m)) = sub_m.subcommand() {
+            if let Some(isbn) = book_m.get_one::<String>("isbn") {
+                crate::commands::handle_add_book(conn, isbn)?;
+            } else {
+                print_err(&tr("help.add.book.isbn"));
+            }
+        }
         Ok(())
     } else if let Some(("help", sub_m)) = matches.subcommand() {
         if let Some(cmd_name) = sub_m.get_one::<String>("command") {

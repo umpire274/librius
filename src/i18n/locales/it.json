@@ -110,5 +110,18 @@
   "import.error.unexpected": "Errore imprevisto durante l'importazione: {error}",
   "help.list.id": "Specifica l'ID del record da visualizzare",
   "help.list.details": "Mostra tutti i campi del record specificato (richiede --id)",
-  "list.error.details_requires_id": "Il flag --details può essere usato solo insieme a --id <ID>."
+  "list.error.details_requires_id": "Il flag --details può essere usato solo insieme a --id <ID>.",
+  "help.add.about": "Aggiunge un nuovo elemento alla libreria",
+  "help.add.book.about": "Aggiunge un libro tramite ISBN usando l'API di Google Books",
+  "help.add.book.isbn": "ISBN del libro da cercare",
+  "help.add.usage": "Uso: librius add book --isbn <ISBN>",
+  "add.lookup": "🔍 Ricerca del libro con ISBN:",
+  "add.success": "Libro '{title}' aggiunto con successo.",
+  "add.no_result": "Nessun libro trovato per l'ISBN fornito.",
+  "help.app.about": "Gestisci la tua biblioteca personale con Librius CLI",
+  "help.list.about": "Elenco tutti i libri nella tua collezione",
+  "help.unknown_command": "Comando sconosciuto. Usa --help per vedere le opzioni disponibili.",
+  "book.add.http_error": "Errore HTTP durante il recupero dei dati del libro: {error}",
+  "book.add.book_info": "Informazioni sul libro analizzate:\n{info}\n",
+  "add.decode_error": "Errore durante la decodifica dei dati del libro: {error}"
 }

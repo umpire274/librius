@@ -110,5 +110,18 @@
   "import.error.unexpected": "Unexpected error during import: {error}",
   "help.list.details": "Show all fields of the specified record (requires --id)",
   "list.error.details_requires_id": "The --details flag can only be used together with --id <ID>.",
-  "help.list.id": "Specify the record ID to show"
+  "help.list.id": "Specify the record ID to show",
+  "help.add.about": "Add a new item to your library",
+  "help.add.book.about": "Add a new book by ISBN using Google Books API",
+  "help.add.book.isbn": "ISBN of the book to fetch",
+  "help.add.usage": "Use: librius add book --isbn <ISBN>",
+  "add.lookup": "🔍 Looking up book with ISBN:",
+  "add.success": "Book '{title}' added successfully.",
+  "add.no_result": "No book found for the provided ISBN.",
+  "help.app.about": "Manage your personal library with Librius CLI",
+  "help.list.about": "List all books in your collection",
+  "help.unknown_command": "Unknown command. Use --help to see available options.",
+  "book.add.http_error": "HTTP error while fetching book data: {error}",
+  "book.add.book_info": "Parsed book info:\n{info}\n",
+  "add.decode_error": "Error decoding book data: {error}"
 }

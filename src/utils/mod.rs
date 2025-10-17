@@ -4,8 +4,10 @@
 // Contiene funzioni di supporto generali e costanti
 // grafiche per output CLI.
 // =====================================================
+pub mod lang;
 pub mod table;
 
+pub use lang::lang_code_to_name;
 pub use table::{build_table, build_vertical_table};
 
 use crate::i18n::tr_with;

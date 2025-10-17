@@ -23,28 +23,30 @@ and import/export support.
 
 ---
 
-## ✨ New in v0.3.0
+## ✨ New in v0.4.0
 
-**🆕 Modern tabular output**
+**📚 Automatic Book Fetching via Google Books API**
 
-- Replaced the old `println!` list format with the [`tabled`](https://crates.io/crates/tabled) crate.
-- Tables now feature aligned, styled columns for improved readability.
-- Added a `--short` flag for compact view (`ID`, `Title`, `Author`, `Editor`, `Year`).
-- Added `--id` and `--details` options to view a single record:
-    - `--id <ID>` shows a specific book by its ID.
-    - `--details` displays all fields of the selected record in a vertical table.
+- Introduced the new command `librius add book --isbn <ISBN>`.
+- Automatically retrieves metadata from the Google Books API:
+    - Title, Author(s), Publisher, Year, Language, Category, Summary.
+- The command inserts the record directly into your local database.
+- If the book is not found, Librius will later support interactive entry mode.
 
-**🧩 Modular architecture**
+**🌍 Localized Help and Language Mapping**
 
-- Standardized all modules using the `mod.rs` structure.
-- Each subsystem (`commands`, `models`, `utils`, `db`, `config`, `i18n`) now has a clean, isolated namespace.
-- Simplified imports using `pub use` re-exports in `lib.rs`.
+- All help messages are dynamically localized (English / Italian).
+- Language codes like `"it"` are automatically expanded to `"Italian"`.
+- Improved JSON decoding and error reporting for external API calls.
 
-**🧱 Utility improvements**
+Example:
 
-- Added a reusable `build_table()` helper in `utils/table.rs` for consistent table rendering.
-- Introduced a dynamic `build_vertical_table()` helper for full record details using `serde_json` + `tabled`.
-- Implemented `BookFull` and `BookShort` structs implementing `Tabled` for both full and compact listings.
+```bash
+$ librius add book --isbn 9788820382698
+🔍 Searching for book with ISBN: 9788820382698
+📘 Book found: “La lingua dell'antico Egitto” — Emanuele M. Ciampini (2018)
+✅ Book “La lingua dell'antico Egitto” added successfully.
+```
 
 ---
 
