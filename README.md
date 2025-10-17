@@ -1,4 +1,7 @@
-# 📚 Librius
+<h1 style="text-align: left;">
+  <img src="res/librius.svg" width="90" style="vertical-align: middle; margin-right: 8px;" alt="Librius Logo"/>
+  Librius
+</h1>
 
 [![Build Status](https://github.com/umpire274/librius/actions/workflows/ci.yml/badge.svg)](https://github.com/umpire274/librius/actions)
 [![Docs.rs](https://docs.rs/librius/badge.svg)](https://docs.rs/librius)
