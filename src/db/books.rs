@@ -85,7 +85,7 @@ pub fn get_book_fields(
                 ValueRef::Null => Ok(None),
                 _ => Ok(None),
             })
-            .unwrap_or_else(|_| None);
+            .unwrap_or(None);
 
         old_values.insert(field.clone(), result);
     }

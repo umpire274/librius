@@ -14,7 +14,7 @@ pub fn handle_edit_book(conn: &Connection, matches: &clap::ArgMatches) -> rusqli
     println!();
 
     for (field, _, _) in EDITABLE_FIELDS {
-        if let Some(value) = matches.get_one::<String>(*field) {
+        if let Some(value) = matches.get_one::<String>(field) {
             // 👇 mappa language_book → language
             let db_field = if *field == "language_book" {
                 "language"

@@ -261,7 +261,7 @@ pub fn build_cli() -> Command {
                             Arg::new(*name)
                                 .long(*name)
                                 .short(*short)
-                                .help(tr_s(*help))
+                                .help(tr_s(help))
                                 .num_args(1)
                                 .action(ArgAction::Set)
                                 .help_heading("Edit Book specific options")
