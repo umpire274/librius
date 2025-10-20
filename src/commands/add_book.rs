@@ -1,10 +1,11 @@
 use crate::i18n::tr;
+use crate::isbn::normalize_isbn;
 use crate::models::book::Book;
 use crate::utils::lang_code_to_name;
 use crate::{is_verbose, print_err, print_info, print_ok, print_warn, tr_with};
 use chrono::Utc;
 use reqwest::blocking::get;
-use rusqlite::Connection;
+use rusqlite::{Connection, Error as RusqliteError, ErrorCode};
 use serde::Deserialize;
 use std::error::Error;
 
@@ -78,7 +79,7 @@ pub fn handle_add_book(conn: &Connection, isbn: &str) -> Result<(), Box<dyn Erro
                         .and_then(|d| d.get(0..4))
                         .and_then(|y| y.parse::<i32>().ok())
                         .unwrap_or_default(),
-                    isbn: isbn.to_string(),
+                    isbn: normalize_isbn(isbn, true).unwrap_or_default(),
                     language: info
                         .language
                         .as_ref()
@@ -93,7 +94,7 @@ pub fn handle_add_book(conn: &Connection, isbn: &str) -> Result<(), Box<dyn Erro
                     added_at: Some(Utc::now()),
                 };
 
-                conn.execute(
+                match conn.execute(
                     "INSERT INTO books (title, author, editor, year, isbn, language, pages, genre, summary, added_at)
                      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, CURRENT_TIMESTAMP)",
                     rusqlite::params![
@@ -107,9 +108,23 @@ pub fn handle_add_book(conn: &Connection, isbn: &str) -> Result<(), Box<dyn Erro
                         new_book.genre,
                         new_book.summary,
                     ],
-                )?;
+                ) {
+                    Ok(_) => {
+                        print_ok(&tr_with("add.success", &[("title", &new_book.title)]), true);
 
-                print_ok(&tr_with("add.success", &[("title", &new_book.title)]), true);
+                    },
+                    Err(e) => {
+                        if let RusqliteError::SqliteFailure(err, _) = &e {
+                            if err.code == ErrorCode::ConstraintViolation {
+                                print_warn(&tr("add.duplicate_isbn"));
+                            } else {
+                                print_err(&tr("add.sql_error"));
+                            }
+                        } else {
+                            print_err(&e.to_string());
+                        }
+                    }
+                }
             } else {
                 print_warn(&tr("add.no_result"));
             }

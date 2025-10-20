@@ -2,17 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.4.0] - 2025-10-18
+## [0.4.0] - 2025-10-18 (in progress)
 
 ### Added
 
 - New command `add book`:
-    - Fetches book information automatically from the Google Books API using ISBN.
-    - Populates title, author, editor, year, language, genre, and summary automatically.
-    - Fallback to interactive mode (planned) for books not found.
+  - Fetches book information automatically from the Google Books API using ISBN.
+  - Populates title, author, editor, year, language, genre, and summary automatically.
+  - Fallback to interactive mode (planned) for books not found.
 - Integrated dynamic i18n support for all CLI help messages (`add`, `book`, `isbn`).
 - Added automatic language name resolution (e.g., `"it"` → `"Italian"`).
 - New utility module `utils/lang.rs` for ISO 639-1 to language name conversion.
+- **New utility module `utils/isbn.rs`:**
+  - Introduced the `normalize_isbn()` helper for validation and bidirectional formatting.
+  - Supports both ISBN-10 and ISBN-13 with hyphenation handling.
+  - Returns localized error messages for invalid, undefined, or malformed ISBNs.
+  - Includes comprehensive unit tests and doctests.
 - Localized console messages for book lookup and insertion results.
 
 ### Changed
@@ -20,11 +25,13 @@ All notable changes to this project will be documented in this file.
 - Modularized command structure: added `add.rs` and `add_book.rs` under `src/commands/`.
 - Improved error handling for Google Books API responses and JSON decoding.
 - Replaced manual `impl Default` blocks with idiomatic `#[derive(Default)]`.
+- Enhanced ISBN display formatting in the `list` command using `normalize_isbn()` for readable hyphenated output.
 
 ### Fixed
 
 - Deserialization issues with Google Books API fields (`volumeInfo`, `publishedDate`, `pageCount`).
 - Empty fields on insertion caused by incorrect field mapping.
+- Prevented duplicate ISBN insertion with user-friendly message (`"Book already present in your library"`).
 
 ### Example usage
 
@@ -34,6 +41,17 @@ $ librius add book --isbn 9788820382698
 📘 Libro trovato: “La lingua dell'antico Egitto” — Emanuele M. Ciampini (2018)
 ✅ Libro “La lingua dell'antico Egitto” aggiunto con successo.
 
+$ librius list --short
+
+📚  Your Library
+
+┌─────┬──────────────────────────────┬──────────────────────┬──────────────────────────────────────────────────────┬──────┬───────────────────┐
+│ ID  │ Title                        │ Author               │ Editor                                               │ Year │ ISBN              │
+├─────┼──────────────────────────────┼──────────────────────┼──────────────────────────────────────────────────────┼──────┼───────────────────┤
+│ 91  │ The Hobbit                   │ J.R.R. Tolkien       │ Allen & Unwin                                        │ 1937 │ 978-0-345-33968-3 │
+│ 92  │ Foundation                   │ Isaac Asimov         │ Gnome Press                                          │ 1951 │ 978-0-553-80371-0 │
+| 128 │ La lingua dell'antico Egitto │ Emanuele M. Ciampini │ Lingue antiche del Vicino Oriente e del Mediterraneo │ 2018 │ 978-88-203-8269-8 │
+└─────┴──────────────────────────────┴──────────────────────┴──────────────────────────────────────────────────────┴──────┴───────────────────┘
 ```
 
 ---

@@ -93,6 +93,7 @@
   "list.header.author": "Autore",
   "list.header.editor": "Editore",
   "list.header.year": "Anno",
+  "list.header.ISBN": "ISBN",
   "list.header.language": "Lingua",
   "list.header.room": "Stanza",
   "list.header.shelf": "Scaffale",
@@ -123,5 +124,14 @@
   "help.unknown_command": "Comando sconosciuto. Usa --help per vedere le opzioni disponibili.",
   "book.add.http_error": "Errore HTTP durante il recupero dei dati del libro: {error}",
   "book.add.book_info": "Informazioni sul libro analizzate:\n{info}\n",
-  "add.decode_error": "Errore durante la decodifica dei dati del libro: {error}"
+  "add.decode_error": "Errore durante la decodifica dei dati del libro: {error}",
+  "add.duplicate_isbn": "Libro già presente in biblioteca.",
+  "add.sql_error": "Errore del database durante il salvataggio del libro.",
+  "book.isbn.invalid_checksum": "Checksum ISBN non valido: {isbn}.",
+  "book.isbn.invalid_length": "Lunghezza ISBN non valida: {isbn}.",
+  "book.isbn.invalid_conversion": "Conversione ISBN non valida: {isbn}.",
+  "book.isbn.invalid_digit": "Cifra non valida nel numero ISBN: {isbn}.",
+  "book.isbn.digit_too_large": "Cifra troppo grande nel numero ISBN: {isbn}.",
+  "book.isbn.invalid_group": "Identificatore di gruppo non valido nell'ISBN: {isbn}.",
+  "book.isbn.undefined_range": "Intervallo indefinito nell'ISBN: {isbn}."
 }

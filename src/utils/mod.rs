@@ -4,6 +4,7 @@
 // Contiene funzioni di supporto generali e costanti
 // grafiche per output CLI.
 // =====================================================
+pub mod isbn;
 pub mod lang;
 pub mod table;
 

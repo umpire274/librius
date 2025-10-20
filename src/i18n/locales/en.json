@@ -93,6 +93,7 @@
   "list.header.author": "Author",
   "list.header.editor": "Editor",
   "list.header.year": "Year",
+  "list.header.ISBN": "ISBN",
   "list.header.language": "Language",
   "list.header.room": "Room",
   "list.header.shelf": "Shelf",
@@ -123,5 +124,14 @@
   "help.unknown_command": "Unknown command. Use --help to see available options.",
   "book.add.http_error": "HTTP error while fetching book data: {error}",
   "book.add.book_info": "Parsed book info:\n{info}\n",
-  "add.decode_error": "Error decoding book data: {error}"
+  "add.decode_error": "Error decoding book data: {error}",
+  "add.duplicate_isbn": "Book already present in your library.",
+  "add.sql_error": "Database error while saving the book.",
+  "book.isbn.invalid_checksum": "Invalid ISBN checksum: {isbn}.",
+  "book.isbn.invalid_length": "Invalid ISBN length: {isbn}.",
+  "book.isbn.invalid_conversion": "Invalid ISBN conversion: {isbn}.",
+  "book.isbn.invalid_digit": "Invalid digit in ISBN number: {isbn}.",
+  "book.isbn.digit_too_large": "Digit too large in ISBN number: {isbn}.",
+  "book.isbn.invalid_group": "Invalid group identifier in ISBN: {isbn}.",
+  "book.isbn.undefined_range": "Undefined range in ISBN: {isbn}."
 }
