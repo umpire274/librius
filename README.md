@@ -23,28 +23,37 @@ and import/export support.
 
 ---
 
-## ✨ New in v0.3.0
+## ✨ New in v0.4.0
 
-**🆕 Modern tabular output**
+**🆕 Edit command**
 
-- Replaced the old `println!` list format with the [`tabled`](https://crates.io/crates/tabled) crate.
-- Tables now feature aligned, styled columns for improved readability.
-- Added a `--short` flag for compact view (`ID`, `Title`, `Author`, `Editor`, `Year`).
-- Added `--id` and `--details` options to view a single record:
-    - `--id <ID>` shows a specific book by its ID.
-    - `--details` displays all fields of the selected record in a vertical table.
+- New command `edit book`:
+    - Allows editing existing records by **ID** or **ISBN**.
+    - Supports all editable fields:  
+      `title`, `author`, `editor`, `year`, `language`, `pages`,  
+      `genre`, `summary`, `room`, `shelf`, `row`, `position`.
+    - Automatically converts language codes (e.g., `en → English`) via `lang_code_to_name()`.
+    - Dynamically generates CLI arguments from a single `EDITABLE_FIELDS` list.
+    - Field updates now show **old and new values**:
+      ```
+      ✅ Field “year” updated successfully (2018 → 2020).
+      ✅ Field “language” updated successfully (Italian → English).
+      ```
+    - Final summary messages are **plural-aware and localized**:
+        - English → `✅ Book 9788820382698 successfully updated (2 fields modified).`
+        - Italian → `✅ Libro 9788820382698 aggiornato correttamente (2 campi modificati).`
 
-**🧩 Modular architecture**
+**🌍 Internationalized CLI**
 
-- Standardized all modules using the `mod.rs` structure.
-- Each subsystem (`commands`, `models`, `utils`, `db`, `config`, `i18n`) now has a clean, isolated namespace.
-- Simplified imports using `pub use` re-exports in `lib.rs`.
+- All commands and help messages are fully localized (`en` / `it`).
+- Ordered and grouped help output using `display_order()` and `next_help_heading()`.
+- Dynamic translations for fields, subcommands, and error messages.
 
-**🧱 Utility improvements**
+**📗 Improved structure**
 
-- Added a reusable `build_table()` helper in `utils/table.rs` for consistent table rendering.
-- Introduced a dynamic `build_vertical_table()` helper for full record details using `serde_json` + `tabled`.
-- Implemented `BookFull` and `BookShort` structs implementing `Tabled` for both full and compact listings.
+- Modular command layout (`add`, `edit`, `list`, `import`, `export`, `backup`, `config`).
+- Centralized field definitions in `fields.rs` for consistent behavior.
+- Cleaner `cli.rs` with display order and grouped help sections.
 
 ---
 
@@ -81,18 +90,19 @@ cargo install rtimelogger
 
 ## ⚙️ Features
 
-| Status | Feature                  | Description                                                                 |
-|:------:|:-------------------------|:----------------------------------------------------------------------------|
-|   ✅    | **List**                 | Display all books stored in the local database                              |
-|   ✅    | **Config management**    | Manage YAML config via `config --print`, `--init`, `--edit`, and `--editor` |
-|   ✅    | **Backup**               | Create plain or compressed database backups (`.sqlite`, `.zip`, `.tar.gz`)  |
-|   ✅    | **Export**               | Export data in CSV, JSON, or XLSX format                                    |
-|   ✅    | **Import**               | Import data from CSV or JSON files (duplicate-safe via ISBN)                |
-|   ✅    | **Database migrations**  | Automatic schema upgrades at startup                                        |
-|   ✅    | **Logging system**       | Records operations and migrations in log table                              |
-|   ✅    | **Multilanguage (i18n)** | Localized CLI (commands, help); embedded JSON; `--lang` + YAML `language`   |
-|   🚧   | **Add / Remove**         | Add or delete books via CLI commands                                        |
-|   🚧   | **Search**               | Search by title, author, or ISBN                                            |
+| Feature                  | Command                          | Description                                                                                                   |
+|:-------------------------|:---------------------------------|:--------------------------------------------------------------------------------------------------------------|
+| **List**                 | `librius list`                   | Display all books stored in the local database, in full or compact view                                       |
+| **Config management**    | `librius config`                 | Manage YAML configuration via `--print`, `--init`, `--edit`, `--editor`                                       |
+| **Backup**               | `librius backup`                 | Create plain or compressed database backups (`.sqlite`, `.zip`, `.tar.gz`)                                    |
+| **Export**               | `librius export`                 | Export data in CSV, JSON, or XLSX format                                                                      |
+| **Import**               | `librius import`                 | Import data from CSV or JSON files (duplicate-safe via ISBN)                                                  |
+| **Database migrations**  | *(automatic)*                    | Automatic schema upgrades and integrity checks at startup                                                     |
+| **Logging system**       | *(internal)*                     | Records all operations and migrations in an internal log table                                                |
+| **Multilanguage (i18n)** | `librius --lang <code>`          | Fully localized CLI (commands, help, messages); `--lang` flag and config key                                  |
+| **Add book**             | `librius add book --isbn <ISBN>` | Add new books using ISBN lookup via Google Books API                                                          |
+| **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages |
+| **Dynamic help system**  | `librius help <command>`         | Ordered and grouped help output using `display_order()` and `next_help_heading()`                             |
 
 ---
 
@@ -119,6 +129,25 @@ $ librius list --short
 │ 1  │ The Rust Programming Language│ Steve Klabnik      │ No Starch    │ 2018 │
 │ 2  │ Clean Code                   │ Robert C. Martin   │ Pearson      │ 2008 │
 └────┴──────────────────────────────┴────────────────────┴──────────────┴──────┘
+
+
+# ➕ Add a book automatically by ISBN
+$ librius add book --isbn 9788820382698
+📘 Book “La lingua dell'antico Egitto” successfully added.
+
+# ✏️ Edit book details
+$ librius edit book 9788820382698 --year 2020
+✅ Field “year” updated successfully (2018 → 2020).
+✅ Book 9788820382698 successfully updated (1 field modified).
+
+# 🌍 Update language (auto conversion from ISO)
+$ librius edit book 9788820382698 --lang_book en
+✅ Field “language” updated successfully (Italian → English).
+
+# 📚 List your library (compact view)
+$ librius list --short
+
+
 ```
 
 ---

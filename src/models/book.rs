@@ -31,11 +31,11 @@ impl<'a> Tabled for BookFull<'a> {
 
     fn fields(&self) -> Vec<Cow<'_, str>> {
         let b = self.0;
-        let added_date = b
-            .added_at
-            .as_ref()
-            .map(|d| d.format("%Y-%m-%d").to_string())
-            .unwrap_or_else(|| "-".into());
+        /*let added_date = b
+        .added_at
+        .as_ref()
+        .map(|d| d.format("%Y-%m-%d").to_string())
+        .unwrap_or_else(|| "-".into());*/
 
         vec![
             Cow::from(b.id.map(|v| v.to_string()).unwrap_or_default()),
@@ -43,11 +43,11 @@ impl<'a> Tabled for BookFull<'a> {
             Cow::from(&b.author),
             Cow::from(&b.editor),
             Cow::from(b.year.to_string()),
+            Cow::from(b.isbn.to_string()),
             Cow::from(b.language.as_deref().unwrap_or("-")),
             Cow::from(b.room.as_deref().unwrap_or("-")),
             Cow::from(b.shelf.as_deref().unwrap_or("-")),
             Cow::from(b.position.as_deref().unwrap_or("-")),
-            Cow::from(added_date),
         ]
     }
 
@@ -58,17 +58,17 @@ impl<'a> Tabled for BookFull<'a> {
             Cow::from(tr("list.header.author")),
             Cow::from(tr("list.header.editor")),
             Cow::from(tr("list.header.year")),
+            Cow::from(tr("list.header.ISBN")),
             Cow::from(tr("list.header.language")),
             Cow::from(tr("list.header.room")),
             Cow::from(tr("list.header.shelf")),
             Cow::from(tr("list.header.position")),
-            Cow::from(tr("list.header.added")),
         ]
     }
 }
 
 impl<'a> Tabled for BookShort<'a> {
-    const LENGTH: usize = 5;
+    const LENGTH: usize = 6;
 
     fn fields(&self) -> Vec<Cow<'_, str>> {
         let b = self.0;
@@ -78,6 +78,7 @@ impl<'a> Tabled for BookShort<'a> {
             Cow::from(&b.author),
             Cow::from(&b.editor),
             Cow::from(b.year.to_string()),
+            Cow::from(b.isbn.to_string()),
         ]
     }
 
@@ -88,6 +89,7 @@ impl<'a> Tabled for BookShort<'a> {
             Cow::from(tr("list.header.author")),
             Cow::from(tr("list.header.editor")),
             Cow::from(tr("list.header.year")),
+            Cow::from(tr("list.header.ISBN")),
         ]
     }
 }

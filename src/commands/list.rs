@@ -1,5 +1,6 @@
 use crate::book::{Book, BookFull, BookShort};
 use crate::i18n::tr;
+use crate::isbn::normalize_isbn;
 use crate::utils::{build_table, build_vertical_table, print_err};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use rusqlite::types::ToSql;
@@ -24,13 +25,25 @@ fn row_to_book(row: &Row) -> rusqlite::Result<Book> {
     let added_at_str: Option<String> = row.get("added_at")?;
     let parsed_added_at = added_at_str.as_deref().and_then(parse_added_at);
 
+    // Recupera ISBN dal DB (senza trattini)
+    let isbn_plain: String = row.get("isbn")?;
+
+    // Prova a formattarlo con trattini (se valido)
+    let isbn_formatted = match normalize_isbn(&isbn_plain, false) {
+        Ok(formatted) => formatted,
+        Err(e) => {
+            print_err(&e.to_string());
+            isbn_plain.clone()
+        } // fallback in caso di ISBN non valido
+    };
+
     Ok(Book {
         id: row.get("id")?,
         title: row.get("title")?,
         author: row.get("author")?,
         editor: row.get("editor")?,
         year: row.get("year")?,
-        isbn: row.get("isbn")?,
+        isbn: isbn_formatted,
         language: row.get("language")?,
         pages: row.get("pages")?,
         genre: row.get("genre")?,
@@ -73,16 +86,13 @@ pub fn handle_list(
     let mut books: Vec<Book> = Vec::new();
 
     // Build owned params: store boxed ToSql trait objects so ownership is
-    // guaranteed and we can build a slice of `&dyn ToSql` for the query.
+    // guaranteed, and we can build a slice of `&dyn ToSql` for the query.
     let mut params_owned: Vec<Box<dyn ToSql>> = Vec::new();
     if let Some(v) = id {
         params_owned.push(Box::new(v));
     }
     // Create a slice of references to pass to rusqlite
-    let params_refs: Vec<&dyn ToSql> = params_owned
-        .iter()
-        .map(|b| b.as_ref() as &dyn ToSql)
-        .collect();
+    let params_refs: Vec<&dyn ToSql> = params_owned.iter().map(|b| b.as_ref()).collect();
 
     let mapped = stmt.query_map(params_refs.as_slice(), row_to_book)?;
     for r in mapped {
