@@ -8,8 +8,10 @@
 //! models (title, author, year, isbn and a timestamp when the record was
 //! added).
 
+pub mod books;
 pub mod load_db;
 pub mod migrate_db;
 
+pub use books::{get_book_fields, update_book_by_id, update_book_by_isbn};
 pub use load_db::{ensure_schema, init_db, start_db};
 pub use migrate_db::{MigrationResult, run_migrations};

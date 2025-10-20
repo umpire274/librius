@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.4.0] - 2025-10-18 (in progress)
+## [0.4.0] - 2025-10-18
 
 ### Added
 
@@ -10,7 +10,24 @@ All notable changes to this project will be documented in this file.
   - Fetches book information automatically from the Google Books API using ISBN.
   - Populates title, author, editor, year, language, genre, and summary automatically.
   - Fallback to interactive mode (planned) for books not found.
-- Integrated dynamic i18n support for all CLI help messages (`add`, `book`, `isbn`).
+- New command `edit book`:
+  - Allows updating any existing book record by ID or ISBN.
+  - Supports all editable fields (`title`, `author`, `editor`, `year`, `language`, `pages`,
+    `genre`, `summary`, `room`, `shelf`, `row`, `position`), excluding ID and ISBN.
+  - Automatically converts language codes (e.g., `"en" → "English"`) using `lang_code_to_name()`.
+  - Dynamically generates CLI arguments for each editable field via a centralized
+    `EDITABLE_FIELDS` definition in `fields.rs`.
+  - Grouped and ordered help output using `display_order()` and `next_help_heading()`:
+    - Global options appear first.
+    - Book-specific options are clearly grouped under titled sections.
+  - Field updates now display **localized detailed messages**:
+    - e.g. `✅ Field "year" updated successfully (2018 → 2020).`
+    - Shows both the previous and new values for each modified field.
+  - Final update summary message supports **language-aware pluralization**:
+    - English: `"✅ Book 9788820382698 successfully updated (2 fields modified)."`
+    - Italian: `"✅ Libro 9788820382698 aggiornato correttamente (2 campi modificati)."`
+
+- Integrated dynamic i18n support for all CLI help messages (`add`, `edit`, `book`, `isbn`).
 - Added automatic language name resolution (e.g., `"it"` → `"Italian"`).
 - New utility module `utils/lang.rs` for ISO 639-1 to language name conversion.
 - **New utility module `utils/isbn.rs`:**
@@ -18,14 +35,18 @@ All notable changes to this project will be documented in this file.
   - Supports both ISBN-10 and ISBN-13 with hyphenation handling.
   - Returns localized error messages for invalid, undefined, or malformed ISBNs.
   - Includes comprehensive unit tests and doctests.
-- Localized console messages for book lookup and insertion results.
+- Localized console messages for book lookup, edition, and insertion results.
 
 ### Changed
 
-- Modularized command structure: added `add.rs` and `add_book.rs` under `src/commands/`.
+- Modularized command structure: added `add.rs`, `add_book.rs`, and `edit_book.rs` under `src/commands/`.
+- Unified language handling logic between `add` and `edit` commands.
 - Improved error handling for Google Books API responses and JSON decoding.
 - Replaced manual `impl Default` blocks with idiomatic `#[derive(Default)]`.
 - Enhanced ISBN display formatting in the `list` command using `normalize_isbn()` for readable hyphenated output.
+- Refactored CLI (`cli.rs`) with ordered, grouped, and localized help output for all commands.
+- Localized final book update message with plural-sensitive translation keys:
+  - `"edit.book.updated.one"` and `"edit.book.updated.many"` in `en.json` / `it.json`.
 
 ### Fixed
 
@@ -36,11 +57,13 @@ All notable changes to this project will be documented in this file.
 ### Example usage
 
 ```bash
+# ➕ Add a new book automatically using its ISBN
 $ librius add book --isbn 9788820382698
-🔍 Ricerca del libro con ISBN: 9788820382698
-📘 Libro trovato: “La lingua dell'antico Egitto” — Emanuele M. Ciampini (2018)
-✅ Libro “La lingua dell'antico Egitto” aggiunto con successo.
+🔍 Searching for book with ISBN: 9788820382698
+📘 Found: “La lingua dell'antico Egitto” — Emanuele M. Ciampini (2018)
+✅ Book “La lingua dell'antico Egitto” successfully added to your library.
 
+# 📚 List all books (compact view)
 $ librius list --short
 
 📚  Your Library
@@ -50,8 +73,37 @@ $ librius list --short
 ├─────┼──────────────────────────────┼──────────────────────┼──────────────────────────────────────────────────────┼──────┼───────────────────┤
 │ 91  │ The Hobbit                   │ J.R.R. Tolkien       │ Allen & Unwin                                        │ 1937 │ 978-0-345-33968-3 │
 │ 92  │ Foundation                   │ Isaac Asimov         │ Gnome Press                                          │ 1951 │ 978-0-553-80371-0 │
-| 128 │ La lingua dell'antico Egitto │ Emanuele M. Ciampini │ Lingue antiche del Vicino Oriente e del Mediterraneo │ 2018 │ 978-88-203-8269-8 │
+│128  │ La lingua dell'antico Egitto │ Emanuele M. Ciampini │ Lingue antiche del Vicino Oriente e del Mediterraneo │ 2018 │ 978-88-203-8269-8 │
 └─────┴──────────────────────────────┴──────────────────────┴──────────────────────────────────────────────────────┴──────┴───────────────────┘
+
+# ✏️ Edit an existing record (by ISBN or ID)
+$ librius edit book 9788820382698 --year 2020
+📝 Updating book with ISBN 9788820382698...
+✅ Field “year” updated successfully (2018 → 2020)
+
+# 🌍 Update language using ISO code (automatically converted)
+$ librius edit book 9788820382698 --lang_book en
+📝 Updating book language...
+✅ Field “language” updated successfully (“Italian” → “English”)
+
+# 📖 Display detailed information
+$ librius list --id 128 --details
+
+📘  Book Details (ID 128)
+────────────────────────────────────────────────────────────────────────────
+Title:        La lingua dell'antico Egitto
+Author:       Emanuele M. Ciampini
+Editor:       Lingue antiche del Vicino Oriente e del Mediterraneo
+Year:         2020
+Language:     English
+Genre:        Linguistics
+Pages:        432
+Room:         B
+Shelf:        4
+Row:          2
+Position:     5
+ISBN:         978-88-203-8269-8
+────────────────────────────────────────────────────────────────────────────
 ```
 
 ---
