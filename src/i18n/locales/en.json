@@ -160,5 +160,13 @@
   "edit.book.not_found": "No matching book found.",
   "edit.book.error_updating": "Error updating book: {error}",
   "edit.book.error_invalid_id": "Invalid ID format.",
-  "edit.book.error_no_field": "No fields specified to update."
+  "edit.book.error_no_field": "No fields specified to update.",
+  "help.del.about": "Delete a book by its ID or ISBN.",
+  "help.del.key": "Specify the book ID or ISBN to delete.",
+  "del.book.success": "Book {key} deleted successfully.",
+  "del.book.not_found": "No matching book found for ID|ISBN {key}.",
+  "del.book.confirm": "Are you sure you want to delete book {key}? [y/N]:",
+  "del.book.cancelled": "Deletion of book {key} cancelled.",
+  "help.del.force": "Delete without asking for confirmation.",
+  "log.record.unable_to_write": "Unable to record log entry: {log_error}",
 }

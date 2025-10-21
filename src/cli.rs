@@ -273,6 +273,28 @@ pub fn build_cli() -> Command {
                 }),
         )
         .subcommand(
+            Command::new("del")
+                .about(tr("help.del.about"))
+                .display_order(90)
+                .arg(
+                    Arg::new("key")
+                        .help(tr("help.del.key")) // e.g. "Book ID or ISBN to delete"
+                        .required(true)
+                        .value_name("ID|ISBN")
+                        .num_args(1)
+                        .display_order(91),
+                )
+                .arg(
+                    Arg::new("force")
+                        .long("force")
+                        .short('f')
+                        .help(tr("help.del.force")) // e.g. "Force deletion without confirmation"
+                        .action(ArgAction::SetTrue)
+                        .num_args(0)
+                        .display_order(92),
+                ),
+        )
+        .subcommand(
             Command::new("help")
                 .about(tr_s("help_flag_about"))
                 .display_order(200)
@@ -318,6 +340,12 @@ pub fn run_cli(
     } else if let Some(("edit", sub_m)) = matches.subcommand() {
         if let Some(("book", book_m)) = sub_m.subcommand() {
             handle_edit_book(conn, book_m)?; // ✅ integrazione comando edit book
+        }
+        Ok(())
+    } else if let Some(("del", sub_m)) = matches.subcommand() {
+        if let Some(key) = sub_m.get_one::<String>("key") {
+            let force = sub_m.get_flag("force");
+            crate::commands::handle_del_book(conn, key, force)?;
         }
         Ok(())
     } else if let Some(("backup", sub_m)) = matches.subcommand() {

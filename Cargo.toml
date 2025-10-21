@@ -1,6 +1,6 @@
 [package]
 name = "librius"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2024"
 authors = ["Alessandro Maestri <umpire274@gmail.com>"]
 description = "A personal library manager CLI written in Rust."
@@ -51,6 +51,9 @@ zip = "6.0.0"
 [target.'cfg(not(windows))'.dependencies]
 flate2 = "1.1.4"
 tar = "0.4.44"
+
+[build-dependencies]
+winresource = "0.1.23"
 
 [profile.release]
 opt-level = 3

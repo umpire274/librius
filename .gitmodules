@@ -1,0 +1,39 @@
+# ================================================================
+# Git Submodules configuration for Librius
+# ================================================================
+# This file defines the external Git repositories ("submodules")
+# that are linked inside this project.
+#
+# Submodules are used to include external or private components
+# (e.g. developer scripts, shared configs, documentation assets)
+# without merging their contents directly into the main repo.
+# ================================================================
+
+# ------------------------------------------------
+# Private developer utilities (not public)
+# ------------------------------------------------
+# Path:       tools_private/
+# Repository: github.com/umpire274/librius-dev-scripts.git
+# Access:     private (owner/collaborators only)
+# ------------------------------------------------
+[submodule "tools_private"]
+	path = tools_private
+	url = git@github.com:umpire274/rust_dev_scripts.git
+
+# ================================================================
+# Tips:
+#   - Clone with submodules:
+#         git clone --recurse-submodules git@github.com:umpire274/librius.git
+#
+#   - If you already cloned:
+#         git submodule update --init --recursive
+#
+#   - Update the submodule (inside main repo):
+#         cd tools_private && git pull origin main && cd ..
+#         git add tools_private
+#         git commit -m "Update private scripts submodule"
+#
+#   - If you move the submodule folder:
+#         git mv old_path new_path
+#         and update the 'path' entry here accordingly.
+# ================================================================
