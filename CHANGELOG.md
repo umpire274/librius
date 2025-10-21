@@ -2,39 +2,77 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1] - 2025-10-22
+
+### Added
+
+- **New `del` command**
+    - Allows deletion of books by **ID or ISBN** with hybrid detection.
+    - Added **interactive confirmation prompt** to prevent accidental deletions.
+    - Introduced **`--force`** flag to skip confirmation in automated workflows.
+    - Integrated with **`write_log()`** to record all deletions (forced or confirmed).
+- Localized all messages and help text for English and Italian.
+- Updated CLI documentation and help output to include the new command.
+
+### Example usage
+
+```bash
+# Interactive mode
+$ librius del 129
+Sei sicuro di voler eliminare il libro 129? [y/N]: y
+✅ Libro 129 eliminato correttamente.
+
+# Forced mode
+$ librius del 9788820382698 --force
+✅ Book 9788820382698 deleted successfully.
+```
+
+### Changed
+
+- Minor cleanup in CLI argument ordering and localized help strings.
+- Improved developer workflow consistency in the tools/ directory.
+
+### Internal
+
+- All deletions are now logged via write_log() for audit and traceability.
+- Added developer scripts in /tools for build and submodule checks.
+- Updated private submodule tools_private to latest revision.
+
+---
+
 ## [0.4.0] - 2025-10-18
 
 ### Added
 
 - New command `add book`:
-  - Fetches book information automatically from the Google Books API using ISBN.
-  - Populates title, author, editor, year, language, genre, and summary automatically.
-  - Fallback to interactive mode (planned) for books not found.
+    - Fetches book information automatically from the Google Books API using ISBN.
+    - Populates title, author, editor, year, language, genre, and summary automatically.
+    - Fallback to interactive mode (planned) for books not found.
 - New command `edit book`:
-  - Allows updating any existing book record by ID or ISBN.
-  - Supports all editable fields (`title`, `author`, `editor`, `year`, `language`, `pages`,
-    `genre`, `summary`, `room`, `shelf`, `row`, `position`), excluding ID and ISBN.
-  - Automatically converts language codes (e.g., `"en" → "English"`) using `lang_code_to_name()`.
-  - Dynamically generates CLI arguments for each editable field via a centralized
-    `EDITABLE_FIELDS` definition in `fields.rs`.
-  - Grouped and ordered help output using `display_order()` and `next_help_heading()`:
-    - Global options appear first.
-    - Book-specific options are clearly grouped under titled sections.
-  - Field updates now display **localized detailed messages**:
-    - e.g. `✅ Field "year" updated successfully (2018 → 2020).`
-    - Shows both the previous and new values for each modified field.
-  - Final update summary message supports **language-aware pluralization**:
-    - English: `"✅ Book 9788820382698 successfully updated (2 fields modified)."`
-    - Italian: `"✅ Libro 9788820382698 aggiornato correttamente (2 campi modificati)."`
+    - Allows updating any existing book record by ID or ISBN.
+    - Supports all editable fields (`title`, `author`, `editor`, `year`, `language`, `pages`,
+      `genre`, `summary`, `room`, `shelf`, `row`, `position`), excluding ID and ISBN.
+    - Automatically converts language codes (e.g., `"en" → "English"`) using `lang_code_to_name()`.
+    - Dynamically generates CLI arguments for each editable field via a centralized
+      `EDITABLE_FIELDS` definition in `fields.rs`.
+    - Grouped and ordered help output using `display_order()` and `next_help_heading()`:
+        - Global options appear first.
+        - Book-specific options are clearly grouped under titled sections.
+    - Field updates now display **localized detailed messages**:
+        - e.g. `✅ Field "year" updated successfully (2018 → 2020).`
+        - Shows both the previous and new values for each modified field.
+    - Final update summary message supports **language-aware pluralization**:
+        - English: `"✅ Book 9788820382698 successfully updated (2 fields modified)."`
+        - Italian: `"✅ Libro 9788820382698 aggiornato correttamente (2 campi modificati)."`
 
 - Integrated dynamic i18n support for all CLI help messages (`add`, `edit`, `book`, `isbn`).
 - Added automatic language name resolution (e.g., `"it"` → `"Italian"`).
 - New utility module `utils/lang.rs` for ISO 639-1 to language name conversion.
 - **New utility module `utils/isbn.rs`:**
-  - Introduced the `normalize_isbn()` helper for validation and bidirectional formatting.
-  - Supports both ISBN-10 and ISBN-13 with hyphenation handling.
-  - Returns localized error messages for invalid, undefined, or malformed ISBNs.
-  - Includes comprehensive unit tests and doctests.
+    - Introduced the `normalize_isbn()` helper for validation and bidirectional formatting.
+    - Supports both ISBN-10 and ISBN-13 with hyphenation handling.
+    - Returns localized error messages for invalid, undefined, or malformed ISBNs.
+    - Includes comprehensive unit tests and doctests.
 - Localized console messages for book lookup, edition, and insertion results.
 
 ### Changed
@@ -46,7 +84,7 @@ All notable changes to this project will be documented in this file.
 - Enhanced ISBN display formatting in the `list` command using `normalize_isbn()` for readable hyphenated output.
 - Refactored CLI (`cli.rs`) with ordered, grouped, and localized help output for all commands.
 - Localized final book update message with plural-sensitive translation keys:
-  - `"edit.book.updated.one"` and `"edit.book.updated.many"` in `en.json` / `it.json`.
+    - `"edit.book.updated.one"` and `"edit.book.updated.many"` in `en.json` / `it.json`.
 
 ### Fixed
 

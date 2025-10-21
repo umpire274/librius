@@ -23,37 +23,25 @@ and import/export support.
 
 ---
 
-## ✨ New in v0.4.0
+## ✨ New in v0.4.1
 
-**🆕 Edit command**
+**🗑️ Book deletion command**
 
-- New command `edit book`:
-    - Allows editing existing records by **ID** or **ISBN**.
-    - Supports all editable fields:  
-      `title`, `author`, `editor`, `year`, `language`, `pages`,  
-      `genre`, `summary`, `room`, `shelf`, `row`, `position`.
-    - Automatically converts language codes (e.g., `en → English`) via `lang_code_to_name()`.
-    - Dynamically generates CLI arguments from a single `EDITABLE_FIELDS` list.
-    - Field updates now show **old and new values**:
-      ```
-      ✅ Field “year” updated successfully (2018 → 2020).
-      ✅ Field “language” updated successfully (Italian → English).
-      ```
-    - Final summary messages are **plural-aware and localized**:
-        - English → `✅ Book 9788820382698 successfully updated (2 fields modified).`
-        - Italian → `✅ Libro 9788820382698 aggiornato correttamente (2 campi modificati).`
+- Introduced the new `del <ID|ISBN>` command for removing books from your library.
+- Supports both numeric IDs and ISBN codes with automatic detection.
+- Added **interactive confirmation** to prevent accidental deletions.
+- Added `--force` flag for non-interactive or scripted deletions.
+- All deletions are now recorded via `write_log()` for full audit traceability.
 
-**🌍 Internationalized CLI**
+**🌍 Localization & Help**
 
-- All commands and help messages are fully localized (`en` / `it`).
-- Ordered and grouped help output using `display_order()` and `next_help_heading()`.
-- Dynamic translations for fields, subcommands, and error messages.
+- Localized all new messages, confirmations, and help strings in **English** and **Italian**.
+- Updated CLI help sections to include the new command and `--force` option.
 
-**📗 Improved structure**
+**🧰 Developer improvements**
 
-- Modular command layout (`add`, `edit`, `list`, `import`, `export`, `backup`, `config`).
-- Centralized field definitions in `fields.rs` for consistent behavior.
-- Cleaner `cli.rs` with display order and grouped help sections.
+- Added developer scripts in `/tools` for build and submodule verification.
+- Updated private submodule `tools_private` to the latest revision.
 
 ---
 
@@ -102,6 +90,7 @@ cargo install rtimelogger
 | **Multilanguage (i18n)** | `librius --lang <code>`          | Fully localized CLI (commands, help, messages); `--lang` flag and config key                                  |
 | **Add book**             | `librius add book --isbn <ISBN>` | Add new books using ISBN lookup via Google Books API                                                          |
 | **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages |
+| **Delete book**          | `del <ID/ISBN>`                  | Delete books by ID or ISBN, with interactive confirmation, `--force` flag, and logged deletions               |
 | **Dynamic help system**  | `librius help <command>`         | Ordered and grouped help output using `display_order()` and `next_help_heading()`                             |
 
 ---
@@ -146,6 +135,13 @@ $ librius edit book 9788820382698 --lang_book en
 
 # 📚 List your library (compact view)
 $ librius list --short
+
+$ librius del 128
+Sei sicuro di voler eliminare il libro 128? [y/N]: y
+✅ Libro 128 eliminato correttamente.
+
+$ librius del 9788820382698 --force
+✅ Book 9788820382698 deleted successfully.
 
 
 ```
