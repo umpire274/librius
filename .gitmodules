@@ -17,8 +17,8 @@
 # Access:     private (owner/collaborators only)
 # ------------------------------------------------
 [submodule "tools_private"]
-    path = tools_private
-    url = git@github.com:umpire274/librius-dev-scripts.git
+	path = tools_private
+	url = git@github.com:umpire274/rust_dev_scripts.git
 
 # ================================================================
 # Tips:
