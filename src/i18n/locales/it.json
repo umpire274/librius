@@ -160,5 +160,13 @@
   "edit.book.not_found": "Nessun libro corrispondente trovato.",
   "edit.book.error_updating": "Errore durante l'aggiornamento del libro: {error}",
   "edit.book.error_invalid_id": "Formato ID non valido.",
-  "edit.book.error_no_field": "Nessun campo specificato da aggiornare."
+  "edit.book.error_no_field": "Nessun campo specificato da aggiornare.",
+  "help.del.about": "Elimina un libro tramite ID o ISBN.",
+  "help.del.key": "Specifica l'ID o l'ISBN del libro da eliminare.",
+  "del.book.success": "Libro {key} eliminato correttamente.",
+  "del.book.not_found": "Nessun libro trovato per ID|ISBN {key}.",
+  "del.book.confirm": "Sei sicuro di voler eliminare il libro {key}? [y/N]:",
+  "del.book.cancelled": "Eliminazione del libro {key} annullata.",
+  "help.del.force": "Elimina senza chiedere conferma.",
+  "log.record.unable_to_write": "Impossibile scrivere il log: {log_error}"
 }
