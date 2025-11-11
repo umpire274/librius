@@ -93,3 +93,27 @@ impl<'a> Tabled for BookShort<'a> {
         ]
     }
 }
+
+use rusqlite::Row;
+
+impl Book {
+    pub fn from_row(row: &Row) -> rusqlite::Result<Self> {
+        Ok(Self {
+            id: row.get("id")?,
+            title: row.get("title")?,
+            author: row.get("author")?,
+            editor: row.get("editor")?,
+            year: row.get("year")?,
+            isbn: row.get("isbn")?,
+            language: row.get("language")?,
+            pages: row.get("pages")?,
+            genre: row.get("genre")?,
+            summary: row.get("summary")?,
+            room: row.get("room")?,
+            shelf: row.get("shelf")?,
+            row: row.get("row")?,
+            position: row.get("position")?,
+            added_at: row.get("added_at")?,
+        })
+    }
+}

@@ -169,4 +169,8 @@
   "del.book.cancelled": "Deletion of book {key} cancelled.",
   "help.del.force": "Delete without asking for confirmation.",
   "log.record.unable_to_write": "Unable to record log entry: {log_error}",
+  "search_about": "Search for books by title, author, editor, genre or language.",
+  "search_query_help": "The keyword or phrase to search for.",
+  "search_short_help": "Show compact view (ID, Title, Author, Editor, Year, ISBN).",
+  "search.no_results": "No results found."
 }
