@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.6] - 2025-11-12
+
+### 🔧 Changed
+
+- **Reorganized command index** in the CLI help output for better logical grouping and readability.  
+  Commands are now displayed in a clearer order, following a structured hierarchy (Book commands, App commands, etc.).
+
+- **Localized help section titles (`help_heading`)** across the entire CLI, including:
+    - “Global options”
+    - “List-specific options”
+    - “Import-specific options”
+    - “Export-specific options”
+    - and other command-related help blocks
+
+- Improved overall **consistency and clarity** of command descriptions and section headings in both English and Italian.
+
+### 🧩 Internal
+
+- Updated `display_order` values to reflect the new command hierarchy.
+- Refined `cli.rs` layout for easier maintenance of localized help headings.
+
+---
+
 ## [0.4.5] - 2025-11-11
 
 ### Added

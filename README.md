@@ -80,6 +80,9 @@ cargo install rtimelogger
 |:-------------------------|:---------------------------------|:---------------------------------------------------------------------------------------------------------------|
 | **List**                 | `librius list`                   | Display all books stored in the local database, in full or compact view                                        |
 | **Search**               | `librius search <query>`         | Full-text search across title, author, editor, genre, and language fields; supports `--short` for compact view |
+| **Add book**             | `librius add book --isbn <ISBN>` | Add new books using ISBN lookup via Google Books API                                                           |
+| **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages  |
+| **Delete book**          | `del <ID/ISBN>`                  | Delete books by ID or ISBN, with interactive confirmation, `--force` flag, and logged deletions                |
 | **Config management**    | `librius config`                 | Manage YAML configuration via `--print`, `--init`, `--edit`, `--editor`                                        |
 | **Backup**               | `librius backup`                 | Create plain or compressed database backups (`.sqlite`, `.zip`, `.tar.gz`)                                     |
 | **Export**               | `librius export`                 | Export data in CSV, JSON, or XLSX format                                                                       |
@@ -87,9 +90,6 @@ cargo install rtimelogger
 | **Database migrations**  | *(automatic)*                    | Automatic schema upgrades and integrity checks at startup                                                      |
 | **Logging system**       | *(internal)*                     | Records all operations and migrations in an internal log table                                                 |
 | **Multilanguage (i18n)** | `librius --lang <code>`          | Fully localized CLI (commands, help, messages); `--lang` flag and config key                                   |
-| **Add book**             | `librius add book --isbn <ISBN>` | Add new books using ISBN lookup via Google Books API                                                           |
-| **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages  |
-| **Delete book**          | `del <ID/ISBN>`                  | Delete books by ID or ISBN, with interactive confirmation, `--force` flag, and logged deletions                |
 | **Dynamic help system**  | `librius help <command>`         | Ordered and grouped help output using `display_order()` and `next_help_heading()`                              |
 
 ---

@@ -172,5 +172,15 @@
   "search_about": "Cerca libri per titolo, autore, editore, genere o lingua.",
   "search_query_help": "La parola o frase da cercare.",
   "search_short_help": "Mostra vista compatta (ID, Titolo, Autore, Editore, Anno, ISBN).",
-  "search.no_results": "Nessun risultato trovato."
+  "search.no_results": "Nessun risultato trovato.",
+  "help.global_options": "Opzioni generali",
+  "help.list_specific_options": "Opzioni specifiche comando 'list'",
+  "help.search_specific_options": "Opzioni specifiche comando 'search'",
+  "help.add_specific_options": "Opzioni specifiche comando 'add'",
+  "help.edit_specific_options": "Opzioni specifiche comando 'edit'",
+  "help.del_specific_options": "Opzioni specifiche comando 'del'",
+  "help.config_specific_options": "Opzioni specifiche comando 'config'",
+  "help.import_specific_options": "Opzioni specifiche comando 'import'",
+  "help.export_specific_options": "Opzioni specifiche comando 'export'",
+  "help.backup_specific_options": "Opzioni specifiche comando 'backup'"
 }

@@ -1,6 +1,6 @@
 [package]
 name = "librius"
-version = "0.4.5"
+version = "0.4.6"
 edition = "2024"
 authors = ["Alessandro Maestri <umpire274@gmail.com>"]
 description = "A personal library manager CLI written in Rust."
