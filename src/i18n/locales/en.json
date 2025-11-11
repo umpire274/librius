@@ -172,5 +172,15 @@
   "search_about": "Search for books by title, author, editor, genre or language.",
   "search_query_help": "The keyword or phrase to search for.",
   "search_short_help": "Show compact view (ID, Title, Author, Editor, Year, ISBN).",
-  "search.no_results": "No results found."
+  "search.no_results": "No results found.",
+  "help.global_options": "Global Options",
+  "help.list_specific_options": "List-specific options",
+  "help.search_specific_options": "Search-specific options",
+  "help.add_specific_options": "Add Book specific options",
+  "help.edit_specific_options": "Edit Book specific options",
+  "help.del_specific_options": "Delete Book specific options",
+  "help.config_specific_options": "Config-specific options",
+  "help.import_specific_options": "Import-specific options",
+  "help.export_specific_options": "Export-specific options",
+  "help.backup_specific_options": "Backup-specific options"
 }

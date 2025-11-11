@@ -19,7 +19,7 @@ pub fn build_cli() -> Command {
                 .help(tr_s("help_flag_about"))
                 .action(ArgAction::Help)
                 .global(true)
-                .help_heading("Global options")
+                .help_heading(tr_s("help.global_options"))
                 .display_order(1),
         )
         .arg(
@@ -29,7 +29,7 @@ pub fn build_cli() -> Command {
                 .help(tr_s("help_verbose"))
                 .action(ArgAction::SetTrue)
                 .global(true)
-                .help_heading("Global options")
+                .help_heading(tr_s("help.global_options"))
                 .display_order(2),
         )
         .arg(
@@ -39,7 +39,7 @@ pub fn build_cli() -> Command {
                 .help(tr_s("help_lang"))
                 .global(true)
                 .num_args(1)
-                .help_heading("Global options")
+                .help_heading(tr_s("help.global_options"))
                 .display_order(3),
         )
         // 📘 list command
@@ -52,7 +52,7 @@ pub fn build_cli() -> Command {
                         .long("short")
                         .help(tr_s("help.list.short"))
                         .action(ArgAction::SetTrue)
-                        .help_heading("List-specific options")
+                        .help_heading(tr_s("help.list_specific_options"))
                         .display_order(11),
                 )
                 .arg(
@@ -62,7 +62,7 @@ pub fn build_cli() -> Command {
                         .value_name("ID")
                         .num_args(1)
                         .value_parser(clap::value_parser!(i32))
-                        .help_heading("List-specific options")
+                        .help_heading(tr_s("help.list_specific_options"))
                         .display_order(12),
                 )
                 .arg(
@@ -70,7 +70,7 @@ pub fn build_cli() -> Command {
                         .long("details")
                         .help(tr_s("help.list.details"))
                         .action(ArgAction::SetTrue)
-                        .help_heading("List-specific options")
+                        .help_heading(tr_s("help.list_specific_options"))
                         .display_order(13),
                 ),
         )
@@ -85,7 +85,7 @@ pub fn build_cli() -> Command {
                         .required(true)
                         .value_name("QUERY")
                         .num_args(1)
-                        .help_heading("Search-specific options")
+                        .help_heading(tr_s("help.search_specific_options"))
                         .display_order(16),
                 )
                 .arg(
@@ -93,169 +93,27 @@ pub fn build_cli() -> Command {
                         .long("short")
                         .help(tr_s("search_short_help"))
                         .action(ArgAction::SetTrue)
-                        .help_heading("Search-specific options")
+                        .help_heading(tr_s("help.search_specific_options"))
                         .display_order(17),
-                ),
-        )
-        // ⚙️ config command
-        .subcommand(
-            Command::new("config")
-                .about(tr_s("config_about"))
-                .display_order(20)
-                .arg(
-                    Arg::new("init")
-                        .long("init")
-                        .help(tr_s("config_init_help"))
-                        .action(ArgAction::SetTrue)
-                        .help_heading("Config-specific options")
-                        .display_order(21),
-                )
-                .arg(
-                    Arg::new("print")
-                        .long("print")
-                        .help(tr_s("config_print_help"))
-                        .action(ArgAction::SetTrue)
-                        .help_heading("Config-specific options")
-                        .display_order(22),
-                )
-                .arg(
-                    Arg::new("edit")
-                        .long("edit")
-                        .help(tr_s("config_edit_help"))
-                        .action(ArgAction::SetTrue)
-                        .help_heading("Config-specific options")
-                        .display_order(23),
-                )
-                .arg(
-                    Arg::new("editor")
-                        .long("editor")
-                        .requires("edit")
-                        .num_args(1)
-                        .help(tr_s("config_editor_help"))
-                        .help_heading("Config-specific options")
-                        .display_order(24),
-                ),
-        )
-        // 💾 backup command
-        .subcommand(
-            Command::new("backup")
-                .about(tr_s("backup_about"))
-                .display_order(30)
-                .arg(
-                    Arg::new("compress")
-                        .long("compress")
-                        .help(tr_s("backup_compress_help"))
-                        .action(ArgAction::SetTrue)
-                        .help_heading("Backup-specific options")
-                        .display_order(31),
-                ),
-        )
-        // 📤 export command
-        .subcommand(
-            Command::new("export")
-                .about(tr_s("export_about"))
-                .display_order(40)
-                .arg(
-                    Arg::new("csv")
-                        .long("csv")
-                        .help(tr_s("export_csv_help"))
-                        .action(ArgAction::SetTrue)
-                        .conflicts_with_all(["xlsx", "json"])
-                        .help_heading("Export-specific options")
-                        .display_order(41),
-                )
-                .arg(
-                    Arg::new("xlsx")
-                        .long("xlsx")
-                        .help(tr_s("export_xlsx_help"))
-                        .conflicts_with_all(["csv", "json"])
-                        .action(ArgAction::SetTrue)
-                        .help_heading("Export-specific options")
-                        .display_order(42),
-                )
-                .arg(
-                    Arg::new("json")
-                        .long("json")
-                        .help(tr_s("export_json_help"))
-                        .conflicts_with_all(["csv", "xlsx"])
-                        .action(ArgAction::SetTrue)
-                        .help_heading("Export-specific options")
-                        .display_order(43),
-                )
-                .arg(
-                    Arg::new("output")
-                        .short('o')
-                        .long("output")
-                        .help(tr_s("export_output_help"))
-                        .value_name("FILE")
-                        .required(false)
-                        .help_heading("Export-specific options")
-                        .display_order(44),
-                ),
-        )
-        // 📥 import command
-        .subcommand(
-            Command::new("import")
-                .about(tr_s("import_about"))
-                .display_order(50)
-                .arg(
-                    Arg::new("file")
-                        .short('f')
-                        .long("file")
-                        .help(tr_s("import_file_help"))
-                        .required(true)
-                        .value_name("PATH")
-                        .help_heading("Import-specific options")
-                        .display_order(51),
-                )
-                .arg(
-                    Arg::new("csv")
-                        .long("csv")
-                        .help(tr_s("import_csv_help"))
-                        .action(ArgAction::SetTrue)
-                        .conflicts_with("json")
-                        .help_heading("Import-specific options")
-                        .display_order(52),
-                )
-                .arg(
-                    Arg::new("json")
-                        .long("json")
-                        .help(tr_s("import_json_help"))
-                        .conflicts_with("csv")
-                        .action(ArgAction::SetTrue)
-                        .help_heading("Import-specific options")
-                        .display_order(53),
-                )
-                .arg(
-                    Arg::new("delimiter")
-                        .short('d')
-                        .long("delimiter")
-                        .help(tr_s("import_delimiter_help"))
-                        .num_args(1)
-                        .value_name("CHAR")
-                        .required(false)
-                        .value_parser(clap::builder::NonEmptyStringValueParser::new())
-                        .help_heading("Import-specific options")
-                        .display_order(54),
                 ),
         )
         // ➕ add book command
         .subcommand(
             Command::new("add")
                 .about(tr("help.add.about"))
-                .display_order(60)
+                .display_order(20)
                 .subcommand(
                     Command::new("book")
                         .about(tr("help.add.book.about"))
-                        .display_order(61)
+                        .display_order(21)
                         .arg(
                             Arg::new("isbn")
                                 .long("isbn")
                                 .help(tr_s("help.add.book.isbn"))
                                 .required(true)
                                 .value_name("ISBN")
-                                .help_heading("Add Book specific options")
-                                .display_order(62),
+                                .help_heading(tr_s("help.add_specific_options"))
+                                .display_order(22),
                         ),
                 ),
         )
@@ -263,18 +121,18 @@ pub fn build_cli() -> Command {
         .subcommand(
             Command::new("edit")
                 .about(tr("help.edit.about"))
-                .display_order(70)
+                .display_order(30)
                 .subcommand({
                     let mut cmd = Command::new("book")
                         .about(tr("help.edit.book.about"))
-                        .display_order(71)
+                        .display_order(31)
                         .arg(
                             Arg::new("key")
                                 .help(tr_s("help.edit.book.key"))
                                 .required(true)
                                 .num_args(1)
-                                .help_heading("Edit Book required option")
-                                .display_order(72),
+                                .help_heading(tr_s("help.edit_specific_options"))
+                                .display_order(32),
                         );
 
                     // ✅ Aggiunta dinamica di tutti i campi editabili
@@ -286,8 +144,8 @@ pub fn build_cli() -> Command {
                                 .help(tr_s(help))
                                 .num_args(1)
                                 .action(ArgAction::Set)
-                                .help_heading("Edit Book specific options")
-                                .display_order(80 + i),
+                                .help_heading(tr_s("help.edit_specific_options"))
+                                .display_order(40 + i),
                         );
                     }
 
@@ -297,14 +155,14 @@ pub fn build_cli() -> Command {
         .subcommand(
             Command::new("del")
                 .about(tr("help.del.about"))
-                .display_order(90)
+                .display_order(50)
                 .arg(
                     Arg::new("key")
                         .help(tr("help.del.key")) // e.g. "Book ID or ISBN to delete"
                         .required(true)
                         .value_name("ID|ISBN")
                         .num_args(1)
-                        .display_order(91),
+                        .display_order(51),
                 )
                 .arg(
                     Arg::new("force")
@@ -313,7 +171,149 @@ pub fn build_cli() -> Command {
                         .help(tr("help.del.force")) // e.g. "Force deletion without confirmation"
                         .action(ArgAction::SetTrue)
                         .num_args(0)
+                        .display_order(52),
+                ),
+        )
+        // ⚙️ config command
+        .subcommand(
+            Command::new("config")
+                .about(tr_s("config_about"))
+                .display_order(60)
+                .arg(
+                    Arg::new("init")
+                        .long("init")
+                        .help(tr_s("config_init_help"))
+                        .action(ArgAction::SetTrue)
+                        .help_heading(tr_s("help.config_specific_options"))
+                        .display_order(61),
+                )
+                .arg(
+                    Arg::new("print")
+                        .long("print")
+                        .help(tr_s("config_print_help"))
+                        .action(ArgAction::SetTrue)
+                        .help_heading(tr_s("help.config_specific_options"))
+                        .display_order(62),
+                )
+                .arg(
+                    Arg::new("edit")
+                        .long("edit")
+                        .help(tr_s("config_edit_help"))
+                        .action(ArgAction::SetTrue)
+                        .help_heading(tr_s("help.config_specific_options"))
+                        .display_order(63),
+                )
+                .arg(
+                    Arg::new("editor")
+                        .long("editor")
+                        .requires("edit")
+                        .num_args(1)
+                        .help(tr_s("config_editor_help"))
+                        .help_heading(tr_s("help.config_specific_options"))
+                        .display_order(64),
+                ),
+        )
+        // 💾 backup command
+        .subcommand(
+            Command::new("backup")
+                .about(tr_s("backup_about"))
+                .display_order(70)
+                .arg(
+                    Arg::new("compress")
+                        .long("compress")
+                        .help(tr_s("backup_compress_help"))
+                        .action(ArgAction::SetTrue)
+                        .help_heading(tr_s("help.backup_specific_options"))
+                        .display_order(71),
+                ),
+        )
+        // 📤 export command
+        .subcommand(
+            Command::new("export")
+                .about(tr_s("export_about"))
+                .display_order(80)
+                .arg(
+                    Arg::new("csv")
+                        .long("csv")
+                        .help(tr_s("export_csv_help"))
+                        .action(ArgAction::SetTrue)
+                        .conflicts_with_all(["xlsx", "json"])
+                        .help_heading(tr_s("help.export_specific_options"))
+                        .display_order(81),
+                )
+                .arg(
+                    Arg::new("xlsx")
+                        .long("xlsx")
+                        .help(tr_s("export_xlsx_help"))
+                        .conflicts_with_all(["csv", "json"])
+                        .action(ArgAction::SetTrue)
+                        .help_heading(tr_s("help.export_specific_options"))
+                        .display_order(82),
+                )
+                .arg(
+                    Arg::new("json")
+                        .long("json")
+                        .help(tr_s("export_json_help"))
+                        .conflicts_with_all(["csv", "xlsx"])
+                        .action(ArgAction::SetTrue)
+                        .help_heading(tr_s("help.export_specific_options"))
+                        .display_order(83),
+                )
+                .arg(
+                    Arg::new("output")
+                        .short('o')
+                        .long("output")
+                        .help(tr_s("export_output_help"))
+                        .value_name("FILE")
+                        .required(false)
+                        .help_heading(tr_s("help.export_specific_options"))
+                        .display_order(84),
+                ),
+        )
+        // 📥 import command
+        .subcommand(
+            Command::new("import")
+                .about(tr_s("import_about"))
+                .display_order(90)
+                .arg(
+                    Arg::new("file")
+                        .short('f')
+                        .long("file")
+                        .help(tr_s("import_file_help"))
+                        .required(true)
+                        .value_name("PATH")
+                        .help_heading(tr_s("help.import_specific_options"))
+                        .display_order(91),
+                )
+                .arg(
+                    Arg::new("csv")
+                        .long("csv")
+                        .help(tr_s("import_csv_help"))
+                        .action(ArgAction::SetTrue)
+                        .conflicts_with("json")
+                        .help_heading(tr_s("help.import_specific_options"))
                         .display_order(92),
+                )
+                .arg(
+                    Arg::new("json")
+                        .long("json")
+                        .help(tr_s("import_json_help"))
+                        .conflicts_with("csv")
+                        .action(ArgAction::SetTrue)
+                        .help_heading(tr_s("help.import_specific_options"))
+                        .display_order(93),
+                )
+                .arg(
+                    Arg::new("delimiter")
+                        .short('d')
+                        .long("delimiter")
+                        .help(tr_s("import_delimiter_help"))
+                        .num_args(1)
+                        .value_name("CHAR")
+                        .required(false)
+                        .value_parser(clap::builder::NonEmptyStringValueParser::new())
+                        .help_heading(tr_s("help.import_specific_options"))
+                        .display_order(94),
                 ),
         )
         .subcommand(

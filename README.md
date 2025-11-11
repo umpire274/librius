@@ -23,23 +23,20 @@ and import/export support.
 
 ---
 
-### ✨ New in v0.4.5
+### ✨ New in v0.4.6
 
-**🔍 Full-text book search**
+**🔧 CLI help reorganization and localization**
 
-- Introduced the new `search` command:
-  ```bash
-  librius search <query> [--short]
-  ```
-  #### Example usage:
-  ```bash
-  $ librius search "dune"
-  $ librius search "frank herbert" --short
-  ```
-- Performs full-text lookup across **title, author, editor, genre, and language** fields.
-- Supports both **compact** (`--short`) and **full** table views.
-- Uses the same localized message system (`tr()`) as the rest of the CLI.
-- Unified output style with `print_info`, `print_ok`, and `print_warn` for consistent visual feedback.
+- Reorganized the **command index** in the main help output to provide a clearer, more intuitive structure.
+    - Commands are now grouped into:
+        - 📚 **Book commands** — `list`, `search`, `add`, `edit`, `del`
+        - ⚙️ **App commands** — `config`, `backup`, `export`, `import`
+        - ❓ **Other commands** — `help`
+- Added **full localization** to all help section titles (`help_heading`), ensuring the help text is completely
+  translated and consistent between English and Italian.
+- Improved the **readability and logical flow** of command listings and global options.
+- Updated `display_order` values to match the new command grouping.
+- Refactored `cli.rs` to simplify future maintenance and localization.
 
 ---
 
@@ -80,6 +77,9 @@ cargo install rtimelogger
 |:-------------------------|:---------------------------------|:---------------------------------------------------------------------------------------------------------------|
 | **List**                 | `librius list`                   | Display all books stored in the local database, in full or compact view                                        |
 | **Search**               | `librius search <query>`         | Full-text search across title, author, editor, genre, and language fields; supports `--short` for compact view |
+| **Add book**             | `librius add book --isbn <ISBN>` | Add new books using ISBN lookup via Google Books API                                                           |
+| **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages  |
+| **Delete book**          | `del <ID/ISBN>`                  | Delete books by ID or ISBN, with interactive confirmation, `--force` flag, and logged deletions                |
 | **Config management**    | `librius config`                 | Manage YAML configuration via `--print`, `--init`, `--edit`, `--editor`                                        |
 | **Backup**               | `librius backup`                 | Create plain or compressed database backups (`.sqlite`, `.zip`, `.tar.gz`)                                     |
 | **Export**               | `librius export`                 | Export data in CSV, JSON, or XLSX format                                                                       |
@@ -87,9 +87,6 @@ cargo install rtimelogger
 | **Database migrations**  | *(automatic)*                    | Automatic schema upgrades and integrity checks at startup                                                      |
 | **Logging system**       | *(internal)*                     | Records all operations and migrations in an internal log table                                                 |
 | **Multilanguage (i18n)** | `librius --lang <code>`          | Fully localized CLI (commands, help, messages); `--lang` flag and config key                                   |
-| **Add book**             | `librius add book --isbn <ISBN>` | Add new books using ISBN lookup via Google Books API                                                           |
-| **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages  |
-| **Delete book**          | `del <ID/ISBN>`                  | Delete books by ID or ISBN, with interactive confirmation, `--force` flag, and logged deletions                |
 | **Dynamic help system**  | `librius help <command>`         | Ordered and grouped help output using `display_order()` and `next_help_heading()`                              |
 
 ---
@@ -501,7 +498,7 @@ The latest migration adds a unique index on `isbn` to guarantee
 that duplicate imports are ignored safely.
 
 ```sqlite
-CREATE UNIQUE INDEX IF NOT EXISTS idx_books_isbn ON books(isbn);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_books_isbn ON books (isbn);
 ```
 
 - On first launch → creates books table.
