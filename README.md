@@ -300,7 +300,7 @@ Each `.json` file contains key–value pairs like:
 Variables can be inserted at runtime:
 
 ```rust
-tr_with("db.path.open_existing", & [("path", & db_path)]);
+tr_with!("db.path.open_existing", & [("path", & db_path)]);
 ```
 
 ---
@@ -459,7 +459,7 @@ Librius now follows a standard Rust modular structure:
 ### Example import
 
 ```rust
-use librius::{build_cli, handle_list; tr};
+use librius::{build_cli, handle_list, tr};
 ```
 
 ---
@@ -500,7 +500,7 @@ Librius automatically verifies and upgrades the SQLite database schema at startu
 The latest migration adds a unique index on `isbn` to guarantee
 that duplicate imports are ignored safely.
 
-```sql
+```sqlite
 CREATE UNIQUE INDEX IF NOT EXISTS idx_books_isbn ON books(isbn);
 ```
 
