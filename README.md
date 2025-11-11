@@ -23,20 +23,45 @@ and import/export support.
 
 ---
 
-### ✨ New in v0.4.6
+### ✨ New in v0.5.0
 
-**🔧 CLI help reorganization and localization**
+**🧪 Complete test suite**
 
-- Reorganized the **command index** in the main help output to provide a clearer, more intuitive structure.
-    - Commands are now grouped into:
-        - 📚 **Book commands** — `list`, `search`, `add`, `edit`, `del`
-        - ⚙️ **App commands** — `config`, `backup`, `export`, `import`
-        - ❓ **Other commands** — `help`
-- Added **full localization** to all help section titles (`help_heading`), ensuring the help text is completely
-  translated and consistent between English and Italian.
-- Improved the **readability and logical flow** of command listings and global options.
-- Updated `display_order` values to match the new command grouping.
-- Refactored `cli.rs` to simplify future maintenance and localization.
+- Introduced a robust **automated testing framework** for both CLI and database layers.
+- Tests now use the **real production schema**, ensuring consistent validation of all database operations.
+- Added a new helper `setup_temp_db()` that automatically creates temporary SQLite databases:
+    - Windows → `%TEMP%\librius_test_*.db`
+    - macOS / Linux → `/tmp/librius_test_*.db`
+- Unified test structure under `/tests/` for clarity and scalability.
+
+Example structure:
+
+``` text
+tests/
+├── common.rs # Shared helpers (DB setup, fixtures)
+├── db_tests.rs # Database-level tests
+├── cli_tests.rs # CLI behavior tests
+├── isbn_tests.rs # ISBN module tests
+└── librius_core_tests.rs # Core command handler tests
+```
+
+**🔧 Modular CLI refactor**
+
+- Reorganized the CLI into a **modular structure** for better readability and future reuse:
+    - `cli/args.rs` → Command definitions and global options.
+    - `cli/dispatch.rs` → Command routing and subcommand handling.
+    - `cli/mod.rs` → Unified CLI interface for main.rs.
+- Simplified the main dispatcher logic and improved localization consistency.
+- Prepared the CLI subsystem for integration with the upcoming `librius_core` library and GUI frontend.
+
+---
+
+**🧱 Internal improvements**
+
+- Removed legacy `#[cfg(test)]` blocks from source code.
+- Cleaned up all build and Clippy warnings.
+- Verified stability across all major platforms (Windows, macOS, Linux).
+- Established the technical foundation for continuous integration (coming in `v0.5.1`).
 
 ---
 
