@@ -23,23 +23,20 @@ and import/export support.
 
 ---
 
-### ✨ New in v0.4.5
+### ✨ New in v0.4.6
 
-**🔍 Full-text book search**
+**🔧 CLI help reorganization and localization**
 
-- Introduced the new `search` command:
-  ```bash
-  librius search <query> [--short]
-  ```
-  #### Example usage:
-  ```bash
-  $ librius search "dune"
-  $ librius search "frank herbert" --short
-  ```
-- Performs full-text lookup across **title, author, editor, genre, and language** fields.
-- Supports both **compact** (`--short`) and **full** table views.
-- Uses the same localized message system (`tr()`) as the rest of the CLI.
-- Unified output style with `print_info`, `print_ok`, and `print_warn` for consistent visual feedback.
+- Reorganized the **command index** in the main help output to provide a clearer, more intuitive structure.
+    - Commands are now grouped into:
+        - 📚 **Book commands** — `list`, `search`, `add`, `edit`, `del`
+        - ⚙️ **App commands** — `config`, `backup`, `export`, `import`
+        - ❓ **Other commands** — `help`
+- Added **full localization** to all help section titles (`help_heading`), ensuring the help text is completely
+  translated and consistent between English and Italian.
+- Improved the **readability and logical flow** of command listings and global options.
+- Updated `display_order` values to match the new command grouping.
+- Refactored `cli.rs` to simplify future maintenance and localization.
 
 ---
 
@@ -501,7 +498,7 @@ The latest migration adds a unique index on `isbn` to guarantee
 that duplicate imports are ignored safely.
 
 ```sqlite
-CREATE UNIQUE INDEX IF NOT EXISTS idx_books_isbn ON books(isbn);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_books_isbn ON books (isbn);
 ```
 
 - On first launch → creates books table.
