@@ -2,7 +2,46 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.4.6] - 2025-11-12
+## [0.5.0] - 2025-11-11
+
+### 🧪 Added
+
+- Introduced a **complete automated test suite** covering both database and CLI layers.
+- Implemented `setup_temp_db()` utility for creating **temporary SQLite databases** in the system temp directory:
+  - Windows → `%TEMP%\librius_test_*.db`
+  - macOS / Linux → `/tmp/librius_test_*.db`
+- Added **unit tests** for database insert and search operations.
+- Added **integration tests** for:
+  - CLI commands (`--help`, `search`, etc.) using `assert_cmd` and `predicates`.
+  - Database schema and consistency validation.
+  - ISBN normalization and formatting.
+- All tests now use the **real production schema** for reliable, cross-platform testing.
+
+---
+
+### 🔧 Changed
+
+- Performed a **modular refactor of the CLI** (`cli.rs` → `cli/` directory):
+  - Split the monolithic `cli.rs` into three logical units:
+    - `args.rs` — defines the full command tree and global flags.
+    - `dispatch.rs` — routes parsed commands to their handlers.
+    - `mod.rs` — re-exports and integrates the CLI components.
+  - Improved code readability, testability, and long-term maintainability.
+  - Prepared CLI for future integration with the `librius_core` crate and the GUI frontend.
+- Simplified the internal command dispatch logic and aligned display order for consistent help output.
+
+---
+
+### 🧱 Internal
+
+- Removed obsolete in-source test modules (`#[cfg(test)]`) from production files.
+- Eliminated build and Clippy warnings by conditionally compiling test-only code.
+- Verified complete cross-platform compatibility (Windows, macOS, Linux).
+- Established the foundation for **multi-platform CI testing** planned for `v0.5.1`.
+
+---
+
+## [0.4.6] - 2025-11-11
 
 ### 🔧 Changed
 
