@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.5] - 2025-11-11
+
+### Added
+
+- **🔍 New `search` command**
+    - Allows searching books by title, author, editor, genre, or language.
+    - Usage:
+      ```bash
+      librius search "dune"
+      librius search "frank herbert" --short
+      ```
+    - Supports both full (`BookFull`) and compact (`BookShort`) table views.
+    - Integrated with i18n for localized output messages and help text.
+
+### Changed
+
+- Unified search output with `print_info`, `print_ok`, and `print_warn` for consistent message style.
+- Renamed `commands/search.rs` → `commands/search_book.rs` to avoid ambiguous glob re-exports.
+- Refactored `search_books()` in `db/search.rs` to remove redundant closure for Clippy compliance.
+
+---
+
 ## [0.4.1] - 2025-10-22
 
 ### Added

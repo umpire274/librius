@@ -1,8 +1,7 @@
-use crate::commands::{handle_config, handle_edit_book, handle_list};
 use crate::fields::EDITABLE_FIELDS;
 use crate::i18n::{tr, tr_s};
-use crate::tr_with;
 use crate::utils::print_err;
+use crate::{handle_config, handle_edit_book, handle_list, handle_search, tr_with};
 use clap::{Arg, ArgAction, Command, Subcommand};
 use rusqlite::Connection;
 
@@ -73,6 +72,29 @@ pub fn build_cli() -> Command {
                         .action(ArgAction::SetTrue)
                         .help_heading("List-specific options")
                         .display_order(13),
+                ),
+        )
+        // 🔍 search command
+        .subcommand(
+            Command::new("search")
+                .about(tr_s("search_about"))
+                .display_order(15)
+                .arg(
+                    Arg::new("query")
+                        .help(tr_s("search_query_help"))
+                        .required(true)
+                        .value_name("QUERY")
+                        .num_args(1)
+                        .help_heading("Search-specific options")
+                        .display_order(16),
+                )
+                .arg(
+                    Arg::new("short")
+                        .long("short")
+                        .help(tr_s("search_short_help"))
+                        .action(ArgAction::SetTrue)
+                        .help_heading("Search-specific options")
+                        .display_order(17),
                 ),
         )
         // ⚙️ config command
@@ -323,6 +345,14 @@ pub fn run_cli(
         let id = matches.get_one::<i32>("id").copied();
         let details = matches.get_flag("details");
         handle_list(conn, short, id, details)?;
+        Ok(())
+    } else if let Some(("search", sub_m)) = matches.subcommand() {
+        if let Some(query) = sub_m.get_one::<String>("query") {
+            let short = sub_m.get_flag("short");
+            handle_search(conn, query, short)?;
+        } else {
+            print_err(&tr("search_query_help"));
+        }
         Ok(())
     } else if let Some(("config", sub_m)) = matches.subcommand() {
         let init = sub_m.get_flag("init");

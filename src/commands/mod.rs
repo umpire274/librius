@@ -13,6 +13,7 @@ pub mod edit_book;
 pub mod export;
 pub mod import;
 pub mod list;
+pub mod search_book;
 
 pub use add::handle_add;
 pub use add_book::handle_add_book;
@@ -26,3 +27,4 @@ pub use export::handle_export_xlsx;
 pub use import::handle_import_csv;
 pub use import::handle_import_json;
 pub use list::handle_list;
+pub use search_book::handle_search;

@@ -168,5 +168,9 @@
   "del.book.confirm": "Sei sicuro di voler eliminare il libro {key}? [y/N]:",
   "del.book.cancelled": "Eliminazione del libro {key} annullata.",
   "help.del.force": "Elimina senza chiedere conferma.",
-  "log.record.unable_to_write": "Impossibile scrivere il log: {log_error}"
+  "log.record.unable_to_write": "Impossibile scrivere il log: {log_error}",
+  "search_about": "Cerca libri per titolo, autore, editore, genere o lingua.",
+  "search_query_help": "La parola o frase da cercare.",
+  "search_short_help": "Mostra vista compatta (ID, Titolo, Autore, Editore, Anno, ISBN).",
+  "search.no_results": "Nessun risultato trovato."
 }

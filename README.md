@@ -23,25 +23,23 @@ and import/export support.
 
 ---
 
-## ✨ New in v0.4.1
+### ✨ New in v0.4.5
 
-**🗑️ Book deletion command**
+**🔍 Full-text book search**
 
-- Introduced the new `del <ID|ISBN>` command for removing books from your library.
-- Supports both numeric IDs and ISBN codes with automatic detection.
-- Added **interactive confirmation** to prevent accidental deletions.
-- Added `--force` flag for non-interactive or scripted deletions.
-- All deletions are now recorded via `write_log()` for full audit traceability.
-
-**🌍 Localization & Help**
-
-- Localized all new messages, confirmations, and help strings in **English** and **Italian**.
-- Updated CLI help sections to include the new command and `--force` option.
-
-**🧰 Developer improvements**
-
-- Added developer scripts in `/tools` for build and submodule verification.
-- Updated private submodule `tools_private` to the latest revision.
+- Introduced the new `search` command:
+  ```bash
+  librius search <query> [--short]
+  ```
+  #### Example usage:
+  ```bash
+  $ librius search "dune"
+  $ librius search "frank herbert" --short
+  ```
+- Performs full-text lookup across **title, author, editor, genre, and language** fields.
+- Supports both **compact** (`--short`) and **full** table views.
+- Uses the same localized message system (`tr()`) as the rest of the CLI.
+- Unified output style with `print_info`, `print_ok`, and `print_warn` for consistent visual feedback.
 
 ---
 
@@ -78,73 +76,164 @@ cargo install rtimelogger
 
 ## ⚙️ Features
 
-| Feature                  | Command                          | Description                                                                                                   |
-|:-------------------------|:---------------------------------|:--------------------------------------------------------------------------------------------------------------|
-| **List**                 | `librius list`                   | Display all books stored in the local database, in full or compact view                                       |
-| **Config management**    | `librius config`                 | Manage YAML configuration via `--print`, `--init`, `--edit`, `--editor`                                       |
-| **Backup**               | `librius backup`                 | Create plain or compressed database backups (`.sqlite`, `.zip`, `.tar.gz`)                                    |
-| **Export**               | `librius export`                 | Export data in CSV, JSON, or XLSX format                                                                      |
-| **Import**               | `librius import`                 | Import data from CSV or JSON files (duplicate-safe via ISBN)                                                  |
-| **Database migrations**  | *(automatic)*                    | Automatic schema upgrades and integrity checks at startup                                                     |
-| **Logging system**       | *(internal)*                     | Records all operations and migrations in an internal log table                                                |
-| **Multilanguage (i18n)** | `librius --lang <code>`          | Fully localized CLI (commands, help, messages); `--lang` flag and config key                                  |
-| **Add book**             | `librius add book --isbn <ISBN>` | Add new books using ISBN lookup via Google Books API                                                          |
-| **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages |
-| **Delete book**          | `del <ID/ISBN>`                  | Delete books by ID or ISBN, with interactive confirmation, `--force` flag, and logged deletions               |
-| **Dynamic help system**  | `librius help <command>`         | Ordered and grouped help output using `display_order()` and `next_help_heading()`                             |
+| Feature                  | Command                          | Description                                                                                                    |
+|:-------------------------|:---------------------------------|:---------------------------------------------------------------------------------------------------------------|
+| **List**                 | `librius list`                   | Display all books stored in the local database, in full or compact view                                        |
+| **Search**               | `librius search <query>`         | Full-text search across title, author, editor, genre, and language fields; supports `--short` for compact view |
+| **Config management**    | `librius config`                 | Manage YAML configuration via `--print`, `--init`, `--edit`, `--editor`                                        |
+| **Backup**               | `librius backup`                 | Create plain or compressed database backups (`.sqlite`, `.zip`, `.tar.gz`)                                     |
+| **Export**               | `librius export`                 | Export data in CSV, JSON, or XLSX format                                                                       |
+| **Import**               | `librius import`                 | Import data from CSV or JSON files (duplicate-safe via ISBN)                                                   |
+| **Database migrations**  | *(automatic)*                    | Automatic schema upgrades and integrity checks at startup                                                      |
+| **Logging system**       | *(internal)*                     | Records all operations and migrations in an internal log table                                                 |
+| **Multilanguage (i18n)** | `librius --lang <code>`          | Fully localized CLI (commands, help, messages); `--lang` flag and config key                                   |
+| **Add book**             | `librius add book --isbn <ISBN>` | Add new books using ISBN lookup via Google Books API                                                           |
+| **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages  |
+| **Delete book**          | `del <ID/ISBN>`                  | Delete books by ID or ISBN, with interactive confirmation, `--force` flag, and logged deletions                |
+| **Dynamic help system**  | `librius help <command>`         | Ordered and grouped help output using `display_order()` and `next_help_heading()`                              |
 
 ---
 
-## 💻 Usage
+## 📖 Commands Overview
+
+### 📘 list
+
+List all books or a specific book by ID.
 
 ```bash
-librius list          # Full detailed list
-librius list --short  # Compact list (ID, Title, Author, Editor, Year)
+$ librius list [--short] [--id <ID>] [--details]
+```
+
+**Options**:
+
+- `--short` Compact view
+- `--id` Show book by ID
+- `--details` Show extended metadata
+
+### 🔍 search
+
+Search for books by title, author, editor, genre, or language.
+
+```bash
+$ librius search <query> [--short]
+```
+
+**Options**:
+
+- `--short` Show compact view (ID, Title, Author, Editor, Year, ISBN)
+- `<query>` Search term
+- `--help` Show command help
+
+### ➕ add book
+
+Add a new book using its ISBN.
+
+```bash
+$ librius add book --isbn <ISBN>
+```
+
+**Options**:
+
+- `--isbn <ISBN>` ISBN of the book to add
+- `--help` Show command help
+
+### ✏️ edit book
+
+Edit an existing book by ID or ISBN.
+
+```bash
+$ librius edit book <ID/ISBN> [--title <TITLE>] [--author <AUTHOR>] [--editor <EDITOR>] [--year <YEAR>] [--genre <GENRE>] [--language <LANGUAGE>] [--isbn <ISBN>]
+```
+
+**Options**:
+
+- `<ID/ISBN>` ID or ISBN of the book to edit
+- `--title <TITLE>` New title
+- `--author <AUTHOR>` New author
+- `--editor <EDITOR>` New editor
+- `--year <YEAR>` New publication year
+- `--genre <GENRE>` New genre
+- `--language <LANGUAGE>` New language
+- `--isbn <ISBN>` New ISBN
+- `--help` Show command help
+
+### ❌ delete book
+
+Delete a book by ID or ISBN.
+
+```bash
+$ librius del <ID/ISBN> [--force]
+```
+
+**Options**:
+
+- `<ID/ISBN>` ID or ISBN of the book to delete
+- `--force` Skip confirmation prompt
+- `--help` Show command help
+
+### ⚙️ config
+
+Manage application configuration.
+
+```bash
+$ librius config [--print] [--init] [--edit] [--editor <EDITOR>]
+```
+
+**Options**:
+
+- `--print` Print current configuration
+- `--init` Create default config file
+- `--edit` Open config file in editor
+- `--editor <EDITOR>` Specify editor (default: `$EDITOR` or `nano`
+
+### 💾 backup
+
+Create a backup of the database.
+
+```bash
+$ librius backup [--compress]
 ``` 
 
----
+**Options**:
 
-## 🧱 Example output
+- `--compress` Create a compressed backup (`.zip` or `.tar.gz`)
+- `--help` Show command help
+
+### 📤 export
+
+Export library data to CSV, JSON, or XLSX.
 
 ```bash
-$ librius list --short
-
-📚  Personal Library
-════════════════════════════════════════════════════════════════════════════════
-
-┌────┬──────────────────────────────┬────────────────────┬──────────────┬──────┐
-│ ID │ Title                        │ Author             │ Editor       │ Year │
-├────┼──────────────────────────────┼────────────────────┼──────────────┼──────┤
-│ 1  │ The Rust Programming Language│ Steve Klabnik      │ No Starch    │ 2018 │
-│ 2  │ Clean Code                   │ Robert C. Martin   │ Pearson      │ 2008 │
-└────┴──────────────────────────────┴────────────────────┴──────────────┴──────┘
-
-
-# ➕ Add a book automatically by ISBN
-$ librius add book --isbn 9788820382698
-📘 Book “La lingua dell'antico Egitto” successfully added.
-
-# ✏️ Edit book details
-$ librius edit book 9788820382698 --year 2020
-✅ Field “year” updated successfully (2018 → 2020).
-✅ Book 9788820382698 successfully updated (1 field modified).
-
-# 🌍 Update language (auto conversion from ISO)
-$ librius edit book 9788820382698 --lang_book en
-✅ Field “language” updated successfully (Italian → English).
-
-# 📚 List your library (compact view)
-$ librius list --short
-
-$ librius del 128
-Sei sicuro di voler eliminare il libro 128? [y/N]: y
-✅ Libro 128 eliminato correttamente.
-
-$ librius del 9788820382698 --force
-✅ Book 9788820382698 deleted successfully.
-
-
+$ librius export [--csv | --json | --xlsx] [-o|--output <FILE>]
 ```
+
+**Options**:
+
+- `--csv` Export as CSV (default)
+- `--json` Export as JSON
+- `--xlsx` Export as XLSX
+- `-o, --output <FILE>` Specify output file path
+- `--help` Show command help
+
+### 📥 import
+
+Import library data from CSV or JSON.
+
+```bash
+$ librius import --file <FILE> [--json] [--csv] [-d|--delimiter <CHAR>]
+```
+
+**Options**:
+
+- `--file <FILE>` Path to input file
+- `--json` Specify if the input file is JSON (default is CSV)
+- `--csv` Specify if the input file is CSV
+- `-d, --delimiter <CHAR>` Specify CSV delimiter (default: `,`)
+- `--help` Show command help
+
+### 🧠 Note
+
+- Every command is fully **localized** in english (default) and italian.
 
 ---
 
@@ -211,7 +300,7 @@ Each `.json` file contains key–value pairs like:
 Variables can be inserted at runtime:
 
 ```rust
-tr_with("db.path.open_existing", & [("path", & db_path)]);
+tr_with!("db.path.open_existing", & [("path", & db_path)]);
 ```
 
 ---
@@ -370,7 +459,7 @@ Librius now follows a standard Rust modular structure:
 ### Example import
 
 ```rust
-use librius::{build_cli, handle_list; tr};
+use librius::{build_cli, handle_list, tr};
 ```
 
 ---
@@ -411,7 +500,7 @@ Librius automatically verifies and upgrades the SQLite database schema at startu
 The latest migration adds a unique index on `isbn` to guarantee
 that duplicate imports are ignored safely.
 
-```sql
+```sqlite
 CREATE UNIQUE INDEX IF NOT EXISTS idx_books_isbn ON books(isbn);
 ```
 
