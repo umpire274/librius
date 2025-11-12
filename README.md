@@ -124,14 +124,16 @@ cargo install rtimelogger
 List all books or a specific book by ID.
 
 ```bash
-$ librius list [--short] [--id <ID>] [--details]
+$ librius list [--short] [--id <ID>] [--details] [--compact]
 ```
 
 **Options**:
 
 - `--short` Compact view
 - `--id` Show book by ID
-- `--details` Show extended metadata
+- `--details` Show extended metadata (requires `--id`)
+- `--compact` Compact list view (requires `--details`)
+- `--help` Show command help
 
 ### 🔍 search
 

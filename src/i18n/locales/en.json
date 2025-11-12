@@ -195,5 +195,12 @@
   "db_init_creating": "Creating database at {path} ...",
   "db_init_done": "Database initialized at {path}.",
   "db_reset_done": "Database reset at {path}.",
-  "db_copy_done": "Database copied from {source} to {destination}."
+  "db_copy_done": "Database copied from {source} to {destination}.",
+  "error.unable_display_record": "Unable to display record: not an object",
+  "list.header.pages": "Pages",
+  "list.header.genre": "Genre",
+  "list.header.summary": "Summary",
+  "list.header.row": "Row",
+  "list.header.added_at": "Added At",
+  "help.list.compact": "Show only fields with values in detailed view."
 }

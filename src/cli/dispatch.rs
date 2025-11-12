@@ -14,7 +14,8 @@ pub fn run_cli(
         let short = matches.get_flag("short");
         let id = matches.get_one::<i32>("id").copied();
         let details = matches.get_flag("details");
-        handle_list(conn, short, id, details)?;
+        let compact = matches.get_flag("compact");
+        handle_list(conn, short, id, details, compact)?;
         Ok(())
     } else if let Some(("search", sub_m)) = matches.subcommand() {
         if let Some(query) = sub_m.get_one::<String>("query") {

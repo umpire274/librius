@@ -195,5 +195,12 @@
   "db_init_creating": "Creo il database in {path} ...",
   "db_init_done": "Database inizializzato in {path}.",
   "db_reset_done": "Database resettato in {path}.",
-  "db_copy_done": "Database copiato da {source} a {destination}."
+  "db_copy_done": "Database copiato da {source} a {destination}.",
+  "error.unable_display_record": "Impossibile visualizzare il record: non è un oggetto",
+  "list.header.pages": "Pagine",
+  "list.header.genre": "Genere",
+  "list.header.summary": "Riepilogo",
+  "list.header.row": "Riga",
+  "list.header.added_at": "Aggiunto alle",
+  "help.list.compact": "Mostra solo i campi valorizzati nella vista dettagliata."
 }

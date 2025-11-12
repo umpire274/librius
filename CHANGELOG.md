@@ -12,11 +12,24 @@ All notable changes to this project will be documented in this file.
     - `librius db --copy -f <FILE>` → copies the current database (as defined in `config.database`) to a new file.
 - Automatic use of the database path from the configuration file (`database:` key in `librius.yaml`).
 - Added localized messages and colored output for database operations.
+- New `--compact` flag for `list --id <ID> --details`:
+    - Hides empty or null fields in the vertical table view.
+    - Useful for cleaner, shorter output when many fields are unused.
+
+### Changed
+
+- The `--compact` flag in `list` is now dependent on `--details`.
+    - Using `--compact` without `--details` will result in an error message.
+    - This ensures consistent CLI behavior and prevents meaningless flag combinations.
 
 ### Fixed
 
 - CLI parsing for `--copy` now correctly behaves as a flag (no value required).
 - Improved integration between configuration and database initialization routines.
+- Corrected vertical table rendering (`list --id <ID> --details`):
+    - Proper localized headers (“Field” / “Value”) are now displayed.
+    - Columns now follow the database schema order instead of alphabetical order.
+    - Improved compatibility with existing `tabled` crate version.
 
 ### Notes
 

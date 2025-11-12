@@ -66,9 +66,19 @@ pub fn build_cli() -> Command {
                     Arg::new("details")
                         .long("details")
                         .help(tr_s("help.list.details"))
+                        .requires("id")
                         .action(ArgAction::SetTrue)
                         .help_heading(tr_s("help.list_specific_options"))
                         .display_order(13),
+                )
+                .arg(
+                    Arg::new("compact")
+                        .long("compact")
+                        .help(tr_s("help.list.compact"))
+                        .requires("details")
+                        .action(ArgAction::SetTrue)
+                        .help_heading(tr_s("help.list_specific_options"))
+                        .display_order(14),
                 ),
         )
         // 🔍 search command
