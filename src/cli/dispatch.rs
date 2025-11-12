@@ -1,11 +1,12 @@
 use crate::cli::{Commands, build_cli};
 use crate::i18n::tr;
 use crate::utils::print_err;
-use crate::{handle_config, handle_edit_book, handle_list, handle_search, tr_with};
+use crate::{AppConfig, handle_config, handle_edit_book, handle_list, handle_search, tr_with};
 use rusqlite::Connection;
 
 /// Dispatch principale dei comandi
 pub fn run_cli(
+    config: &AppConfig,
     matches: &clap::ArgMatches,
     conn: &mut Connection,
 ) -> Result<(), Box<dyn std::error::Error>> {
@@ -13,7 +14,8 @@ pub fn run_cli(
         let short = matches.get_flag("short");
         let id = matches.get_one::<i32>("id").copied();
         let details = matches.get_flag("details");
-        handle_list(conn, short, id, details)?;
+        let compact = matches.get_flag("compact");
+        handle_list(conn, short, id, details, compact)?;
         Ok(())
     } else if let Some(("search", sub_m)) = matches.subcommand() {
         if let Some(query) = sub_m.get_one::<String>("query") {
@@ -36,6 +38,14 @@ pub fn run_cli(
             editor,
         };
         Ok(handle_config(&cmd)?)
+    } else if let Some(("db", sub_m)) = matches.subcommand() {
+        let init = sub_m.get_flag("init");
+        let reset = sub_m.get_flag("reset");
+        let copy = sub_m.get_flag("copy");
+        let file = sub_m.get_one::<String>("file").map(|s| s.as_str());
+
+        crate::commands::db::handle_db(config, init, reset, copy, file)?;
+        Ok(())
     } else if let Some(("edit", sub_m)) = matches.subcommand() {
         if let Some(("book", book_m)) = sub_m.subcommand() {
             handle_edit_book(conn, book_m)?; // ✅ integrazione comando edit book

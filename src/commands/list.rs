@@ -65,6 +65,7 @@ pub fn handle_list(
     _short: bool,
     id: Option<i32>,
     _details: bool,
+    compact: bool,
 ) -> Result<(), Box<dyn Error>> {
     // If user asked for details without specifying an id, show a localized
     // error message and do not display the list.
@@ -112,7 +113,7 @@ pub fn handle_list(
     if id.is_some() {
         let book = &books[0];
         println!("\n📖  {} {:?}\n", tr("list.book_details_for_id"), book.id);
-        build_vertical_table(book);
+        build_vertical_table(book, compact);
     } else {
         // Otherwise show the list (short or full)
         println!("\n{}\n", tr("app.library.info"));

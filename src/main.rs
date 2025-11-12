@@ -83,7 +83,7 @@ fn main() {
     // 6️⃣ CLI localizzata ed esecuzione comandi
     // ------------------------------------------------------------
     let matches = build_cli().get_matches();
-    if let Err(e) = run_cli(&matches, &mut conn) {
+    if let Err(e) = run_cli(&config, &matches, &mut conn) {
         print_err(&format!("{} {}", ERR, e));
     }
 }

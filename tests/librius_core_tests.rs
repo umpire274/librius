@@ -39,7 +39,7 @@ fn exercise_list_handler() -> Result<(), Box<dyn Error>> {
         ],
     )?;
 
-    handle_list(&conn, false, None, false)?;
+    handle_list(&conn, false, None, false, false)?;
     Ok(())
 }
 
@@ -80,6 +80,6 @@ fn exercise_list_handler_short() -> Result<(), Box<dyn Error>> {
         ],
     )?;
 
-    handle_list(&conn, true, None, false)?;
+    handle_list(&conn, true, None, false, false)?;
     Ok(())
 }

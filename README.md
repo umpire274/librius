@@ -23,45 +23,44 @@ and import/export support.
 
 ---
 
-### ✨ New in v0.5.0
+### ✨ New in v0.5.1
 
-**🧪 Complete test suite**
+**🗄️ Database management command**
 
-- Introduced a robust **automated testing framework** for both CLI and database layers.
-- Tests now use the **real production schema**, ensuring consistent validation of all database operations.
-- Added a new helper `setup_temp_db()` that automatically creates temporary SQLite databases:
-    - Windows → `%TEMP%\librius_test_*.db`
-    - macOS / Linux → `/tmp/librius_test_*.db`
-- Unified test structure under `/tests/` for clarity and scalability.
+A brand new `db` command has been introduced for complete database lifecycle control:
 
-Example structure:
-
-``` text
-tests/
-├── common.rs # Shared helpers (DB setup, fixtures)
-├── db_tests.rs # Database-level tests
-├── cli_tests.rs # CLI behavior tests
-├── isbn_tests.rs # ISBN module tests
-└── librius_core_tests.rs # Core command handler tests
+```bash
+librius db --init
 ```
 
-**🔧 Modular CLI refactor**
+Initializes or resets the current database.
 
-- Reorganized the CLI into a **modular structure** for better readability and future reuse:
-    - `cli/args.rs` → Command definitions and global options.
-    - `cli/dispatch.rs` → Command routing and subcommand handling.
-    - `cli/mod.rs` → Unified CLI interface for main.rs.
-- Simplified the main dispatcher logic and improved localization consistency.
-- Prepared the CLI subsystem for integration with the upcoming `librius_core` library and GUI frontend.
+```bash
+librius db --reset
+```
 
----
+Alias of `--init`.
 
-**🧱 Internal improvements**
+```bash
+librius db --copy -f|--file <NEW_FILE>
+```
 
-- Removed legacy `#[cfg(test)]` blocks from source code.
-- Cleaned up all build and Clippy warnings.
-- Verified stability across all major platforms (Windows, macOS, Linux).
-- Established the technical foundation for continuous integration (coming in `v0.5.1`).
+Copies the database defined in your librius.yaml configuration to a new file.
+
+> The database path is automatically read from the database: key in the configuration file.
+
+**📚 Improved list details view**
+
+- Added the -`-compact` flag for list `--id <ID> --details` to hide empty fields in the vertical table.
+- The `--compact` flag now requires `--details`, ensuring consistent CLI behavior.
+- Fixed table headers that previously displayed `String`; now they correctly show localized Field / Value columns.
+- Field order in detailed view now matches the database schema (`id → added_at`).
+
+**🐞 Fixes & improvements**
+
+- Fixed `--copy` flag incorrectly requiring a value.
+- Improved integration between configuration and database operations.
+- Enhanced localized messages and help text for better clarity.
 
 ---
 
@@ -106,6 +105,7 @@ cargo install rtimelogger
 | **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages  |
 | **Delete book**          | `del <ID/ISBN>`                  | Delete books by ID or ISBN, with interactive confirmation, `--force` flag, and logged deletions                |
 | **Config management**    | `librius config`                 | Manage YAML configuration via `--print`, `--init`, `--edit`, `--editor`                                        |
+| **Database management**  | `librius db`                     | DB Management via `--init`, `--reset`, `--copy -f\|--file <name new file>`                                     |
 | **Backup**               | `librius backup`                 | Create plain or compressed database backups (`.sqlite`, `.zip`, `.tar.gz`)                                     |
 | **Export**               | `librius export`                 | Export data in CSV, JSON, or XLSX format                                                                       |
 | **Import**               | `librius import`                 | Import data from CSV or JSON files (duplicate-safe via ISBN)                                                   |
@@ -123,14 +123,16 @@ cargo install rtimelogger
 List all books or a specific book by ID.
 
 ```bash
-$ librius list [--short] [--id <ID>] [--details]
+$ librius list [--short] [--id <ID>] [--details] [--compact]
 ```
 
 **Options**:
 
 - `--short` Compact view
 - `--id` Show book by ID
-- `--details` Show extended metadata
+- `--details` Show extended metadata (requires `--id`)
+- `--compact` Compact list view (requires `--details`)
+- `--help` Show command help
 
 ### 🔍 search
 
@@ -207,6 +209,22 @@ $ librius config [--print] [--init] [--edit] [--editor <EDITOR>]
 - `--init` Create default config file
 - `--edit` Open config file in editor
 - `--editor <EDITOR>` Specify editor (default: `$EDITOR` or `nano`
+- `--help` Show command help
+
+### 🗄️ Database management
+
+Manage the Librius database lifecycle and backups.
+
+```bash
+librius db [--init] [--reset] [--copy -f|--file <NEW_FILE>]
+```
+
+**Options**:
+
+- `--init` Initialize a new database
+- `--reset` Reset the database (deletes all data)
+- `--copy -f|--file <NEW_FILE>` Copy the database to a new file
+- `--help` Show command help
 
 ### 💾 backup
 

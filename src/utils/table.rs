@@ -3,6 +3,7 @@
 //! Provides a unified interface for rendering tabular data using the `tabled` crate,
 //! ensuring consistent visual style and alignment across commands.
 
+use crate::{print_warn, tr};
 use serde::Serialize;
 use serde_json::Value;
 use tabled::settings::{Alignment, Modify, Style, object::Rows};
@@ -38,36 +39,75 @@ where
         .to_string()
 }
 
-pub fn build_vertical_table<T: Serialize>(record: &T) {
-    // Converte la struct in una mappa JSON dinamica
+#[derive(Tabled)]
+struct VerticalRow {
+    #[tabled(rename = "Field")]
+    field: String,
+    #[tabled(rename = "Value")]
+    value: String,
+}
+
+pub fn build_vertical_table<T: Serialize>(record: &T, compact: bool) {
+    // Serializza in mappa dinamica
     let value = serde_json::to_value(record).expect("Failed to serialize record");
 
     if let Value::Object(map) = value {
-        // Costruiamo un vettore di tuple (campo, valore)
-        let mut rows: Vec<(String, String)> = map
-            .into_iter()
-            .map(|(key, val)| {
-                let val_str = match val {
-                    Value::Null => String::from("—"),
-                    Value::String(s) => s,
+        // ✅ Ordine corretto dei campi
+        let field_order = [
+            "id", "title", "author", "editor", "year", "isbn", "language", "pages", "genre",
+            "summary", "room", "shelf", "row", "position", "added_at",
+        ];
+
+        // ✅ Etichette localizzate
+        let field_labels = [
+            tr("list.header.id"),
+            tr("list.header.title"),
+            tr("list.header.author"),
+            tr("list.header.editor"),
+            tr("list.header.year"),
+            tr("list.header.ISBN"),
+            tr("list.header.language"),
+            tr("list.header.pages"),
+            tr("list.header.genre"),
+            tr("list.header.summary"),
+            tr("list.header.room"),
+            tr("list.header.shelf"),
+            tr("list.header.row"),
+            tr("list.header.position"),
+            tr("list.header.added_at"),
+        ];
+
+        // ✅ Costruisci righe ordinate
+        let mut rows: Vec<VerticalRow> = Vec::new();
+
+        for (i, key) in field_order.iter().enumerate() {
+            let value_str = map
+                .get(*key)
+                .map(|v| match v {
+                    Value::Null => "—".to_string(),
+                    Value::String(s) => s.clone(),
                     Value::Number(n) => n.to_string(),
                     Value::Bool(b) => b.to_string(),
                     other => other.to_string(),
-                };
-                (key, val_str)
-            })
-            .collect();
+                })
+                .unwrap_or_else(|| "—".to_string());
 
-        // Ordina alfabeticamente per nome del campo
-        rows.sort_by(|a, b| a.0.cmp(&b.0));
+            // ✅ In modalità compatta, salta i campi vuoti
+            if compact && value_str == "—" {
+                continue;
+            }
 
-        // Crea tabella verticale
-        let style = Style::rounded();
-        // Build an owned string representation to avoid borrowing temporaries
-        let table_str = Table::new(rows).with(style).to_string();
+            rows.push(VerticalRow {
+                field: field_labels[i].clone(),
+                value: value_str,
+            });
+        }
 
-        println!("{}", table_str);
+        // ✅ Crea e stampa la tabella
+        let mut table = Table::new(rows);
+        table.with(Style::rounded());
+        println!("{}", table);
     } else {
-        println!("⚠️ Unable to display record: not an object");
+        print_warn(&tr("error.unable_display_record"));
     }
 }
