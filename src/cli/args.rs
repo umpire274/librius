@@ -210,18 +210,61 @@ pub fn build_cli() -> Command {
                         .display_order(64),
                 ),
         )
+        .subcommand(
+            Command::new("db")
+                .about(tr_s("db_about"))
+                .display_order(65)
+                .arg(
+                    Arg::new("init")
+                        .long("init")
+                        .help(tr_s("db_init_help"))
+                        .action(ArgAction::SetTrue)
+                        .conflicts_with_all(["reset", "copy"])
+                        .help_heading(tr_s("help.db_specific_options"))
+                        .display_order(66),
+                )
+                .arg(
+                    Arg::new("reset")
+                        .long("reset")
+                        .help(tr_s("db_reset_help"))
+                        .action(ArgAction::SetTrue)
+                        .conflicts_with_all(["init", "copy"])
+                        .help_heading(tr_s("help.db_specific_options"))
+                        .display_order(67),
+                )
+                .arg(
+                    Arg::new("copy")
+                        .long("copy")
+                        .help(tr_s("db_copy_help"))
+                        .action(ArgAction::SetTrue)
+                        .conflicts_with_all(["init", "reset"])
+                        .help_heading(tr_s("help.db_specific_options"))
+                        .display_order(68),
+                )
+                .arg(
+                    Arg::new("file")
+                        .short('f')
+                        .long("file")
+                        .help(tr_s("db_file_help"))
+                        .requires("copy")
+                        .num_args(1)
+                        .value_name("PATH")
+                        .help_heading(tr_s("help.db_specific_options"))
+                        .display_order(69),
+                ),
+        )
         // 💾 backup command
         .subcommand(
             Command::new("backup")
                 .about(tr_s("backup_about"))
-                .display_order(70)
+                .display_order(75)
                 .arg(
                     Arg::new("compress")
                         .long("compress")
                         .help(tr_s("backup_compress_help"))
                         .action(ArgAction::SetTrue)
                         .help_heading(tr_s("help.backup_specific_options"))
-                        .display_order(71),
+                        .display_order(76),
                 ),
         )
         // 📤 export command

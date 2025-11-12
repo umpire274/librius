@@ -14,6 +14,6 @@ pub mod migrate_db;
 pub mod search;
 
 pub use books::{get_book_fields, update_book_by_id, update_book_by_isbn};
-pub use load_db::{ensure_schema, init_db, start_db};
+pub use load_db::{ensure_schema, get_db_path, init_db, start_db};
 pub use migrate_db::{MigrationResult, run_migrations};
 pub use search::search_books;

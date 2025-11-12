@@ -182,5 +182,18 @@
   "help.config_specific_options": "Config-specific options",
   "help.import_specific_options": "Import-specific options",
   "help.export_specific_options": "Export-specific options",
-  "help.backup_specific_options": "Backup-specific options"
+  "help.backup_specific_options": "Backup-specific options",
+  "help.db_specific_options": "DB-management specific options",
+  "db_about": "Database management",
+  "db_init_help": "Initialize a new database (overwrite existing one if present).",
+  "db_reset_help": "Reset the current database (alias of --init).",
+  "db_copy_help": "Copy the current database to a new file.",
+  "db_file_help": "Destination file path for the copy.",
+  "db_no_action": "No operation performed. Use --init, --reset or --copy.",
+  "db_no_source": "No existing database to copy.",
+  "db_copy_missing_file": "You must specify --file <PATH> when using --copy.",
+  "db_init_creating": "Creating database at {path} ...",
+  "db_init_done": "Database initialized at {path}.",
+  "db_reset_done": "Database reset at {path}.",
+  "db_copy_done": "Database copied from {source} to {destination}."
 }

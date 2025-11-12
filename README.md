@@ -106,6 +106,7 @@ cargo install rtimelogger
 | **Edit book**            | `librius edit book <ID/ISBN>`    | Edit existing records by ID or ISBN; dynamic field generation, language conversion, and plural-aware messages  |
 | **Delete book**          | `del <ID/ISBN>`                  | Delete books by ID or ISBN, with interactive confirmation, `--force` flag, and logged deletions                |
 | **Config management**    | `librius config`                 | Manage YAML configuration via `--print`, `--init`, `--edit`, `--editor`                                        |
+| **Database management**  | `librius db`                     | DB Management via `--init`, `--reset`, `--copy -f\|--file <name new file>`                                     |
 | **Backup**               | `librius backup`                 | Create plain or compressed database backups (`.sqlite`, `.zip`, `.tar.gz`)                                     |
 | **Export**               | `librius export`                 | Export data in CSV, JSON, or XLSX format                                                                       |
 | **Import**               | `librius import`                 | Import data from CSV or JSON files (duplicate-safe via ISBN)                                                   |
@@ -207,6 +208,22 @@ $ librius config [--print] [--init] [--edit] [--editor <EDITOR>]
 - `--init` Create default config file
 - `--edit` Open config file in editor
 - `--editor <EDITOR>` Specify editor (default: `$EDITOR` or `nano`
+- `--help` Show command help
+
+### 🗄️ Database management
+
+Manage the Librius database lifecycle and backups.
+
+```bash
+librius db [--init] [--reset] [--copy -f|--file <NEW_FILE>]
+```
+
+**Options**:
+
+- `--init` Initialize a new database
+- `--reset` Reset the database (deletes all data)
+- `--copy -f|--file <NEW_FILE>` Copy the database to a new file
+- `--help` Show command help
 
 ### 💾 backup
 
