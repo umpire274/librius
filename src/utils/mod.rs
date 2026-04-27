@@ -5,7 +5,6 @@
 // ri-esporta i simboli pubblici in modo esplicito.
 // =====================================================
 
-pub mod fields;
 pub mod import_helpers;
 pub mod isbn;
 pub mod lang;

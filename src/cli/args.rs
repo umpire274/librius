@@ -1,4 +1,4 @@
-use crate::fields::EDITABLE_FIELDS;
+use crate::cli::fields::EDITABLE_FIELDS;
 use crate::i18n::{tr, tr_s};
 use clap::{Arg, ArgAction, Command};
 

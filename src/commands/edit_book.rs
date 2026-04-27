@@ -1,5 +1,5 @@
 use crate::db::books::{get_book_fields, update_book_by_id, update_book_by_isbn};
-use crate::fields::EDITABLE_FIELDS;
+use crate::cli::fields::EDITABLE_FIELDS;
 use crate::{lang_code_to_name, print_err, print_info, print_ok, print_warn, tr, tr_with};
 use rusqlite::Connection;
 use std::collections::HashMap;

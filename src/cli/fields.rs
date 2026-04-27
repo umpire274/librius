@@ -1,3 +1,14 @@
+// =====================================================
+// Librius - cli/fields.rs
+// -----------------------------------------------------
+// Definizione dei campi editabili di un libro.
+// Usata da args.rs (costruzione CLI) e da edit_book.rs
+// (logica di comando). È una preoccupazione CLI, non
+// una utility generica.
+// =====================================================
+
+/// Lista dei campi editabili di un libro.
+/// Ogni elemento è una tupla (nome_campo, chiave_i18n, shortcut).
 pub const EDITABLE_FIELDS: &[(&str, &str, char)] = &[
     ("title", "help.edit.book.title", 't'),
     ("author", "help.edit.book.author", 'a'),
@@ -12,3 +23,4 @@ pub const EDITABLE_FIELDS: &[(&str, &str, char)] = &[
     ("row", "help.edit.book.row", 'w'),
     ("position", "help.edit.book.position", 'o'),
 ];
+
