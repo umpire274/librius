@@ -1,3 +1,4 @@
+use crate::db::connection::ensure_schema;
 use crate::{AppConfig, print_err, print_ok, print_warn, tr, tr_with};
 use rusqlite::Connection;
 use std::error::Error;
@@ -43,52 +44,11 @@ fn init_db(config: &AppConfig) -> Result<(), Box<dyn Error>> {
     }
 
     let conn = Connection::open(path)?;
-    create_schema(&conn)?;
+    ensure_schema(&conn)?;
     print_ok(
         &tr_with("db_init_done", &[("path", &path.to_string_lossy())]),
         true,
     );
-    Ok(())
-}
-
-/// Crea le tabelle di base nel database appena inizializzato.
-///
-/// Al momento include:
-/// - books → archivio principale dei libri
-/// - log → tabella di log operazioni
-fn create_schema(conn: &Connection) -> Result<(), Box<dyn Error>> {
-    // Tabella principale "books"
-    conn.execute_batch(
-        "
-        CREATE TABLE IF NOT EXISTS books (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            author TEXT NOT NULL,
-            editor TEXT NOT NULL,
-            year INTEGER NOT NULL,
-            isbn TEXT NOT NULL,
-            language TEXT,
-            pages INTEGER,
-            genre TEXT,
-            summary TEXT,
-            room TEXT,
-            shelf TEXT,
-            row TEXT,
-            position TEXT,
-            added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-
-        CREATE TABLE IF NOT EXISTS log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT NOT NULL,
-            operation TEXT NOT NULL,
-            target TEXT DEFAULT '',
-            message TEXT NOT NULL
-        );
-        ",
-    )?;
-
-    print_ok(&tr("db.schema.created"), true);
     Ok(())
 }
 

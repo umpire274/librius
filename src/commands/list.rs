@@ -3,58 +3,23 @@ use crate::models::display::{BookFull, BookShort};
 use crate::i18n::tr;
 use crate::isbn::normalize_isbn;
 use crate::utils::{build_table, build_vertical_table, print_err};
-use chrono::{DateTime, NaiveDateTime, Utc};
 use rusqlite::types::ToSql;
 use rusqlite::{Connection, Row};
 use std::error::Error;
 
-fn parse_added_at(s: &str) -> Option<DateTime<Utc>> {
-    if let Ok(dt) = DateTime::parse_from_rfc3339(s) {
-        return Some(dt.with_timezone(&Utc));
-    }
-    if let Ok(naive) = NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S") {
-        return Some(DateTime::from_naive_utc_and_offset(naive, Utc));
-    }
-    if let Ok(naive) = NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S%.f") {
-        return Some(DateTime::from_naive_utc_and_offset(naive, Utc));
-    }
-    None
-}
-
-// Helper to map a rusqlite::Row into a Book instance.
+/// Maps a rusqlite::Row into a Book, applying ISBN hyphen formatting on top of
+/// the base `Book::from_row()` constructor.
 fn row_to_book(row: &Row) -> rusqlite::Result<Book> {
-    let added_at_str: Option<String> = row.get("added_at")?;
-    let parsed_added_at = added_at_str.as_deref().and_then(parse_added_at);
-
-    // Recupera ISBN dal DB (senza trattini)
-    let isbn_plain: String = row.get("isbn")?;
-
-    // Prova a formattarlo con trattini (se valido)
-    let isbn_formatted = match normalize_isbn(&isbn_plain, false) {
+    let mut book = Book::from_row(row)?;
+    // Format ISBN with hyphens for display; fall back to plain on error.
+    book.isbn = match normalize_isbn(&book.isbn, false) {
         Ok(formatted) => formatted,
         Err(e) => {
             print_err(&e.to_string());
-            isbn_plain.clone()
-        } // fallback in caso di ISBN non valido
+            book.isbn
+        }
     };
-
-    Ok(Book {
-        id: row.get("id")?,
-        title: row.get("title")?,
-        author: row.get("author")?,
-        editor: row.get("editor")?,
-        year: row.get("year")?,
-        isbn: isbn_formatted,
-        language: row.get("language")?,
-        pages: row.get("pages")?,
-        genre: row.get("genre")?,
-        summary: row.get("summary")?,
-        room: row.get("room")?,
-        shelf: row.get("shelf")?,
-        row: row.get("row")?,
-        position: row.get("position")?,
-        added_at: parsed_added_at,
-    })
+    Ok(book)
 }
 
 /// Handle the `list` subcommand.
