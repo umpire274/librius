@@ -100,15 +100,15 @@ tests/
 
 ## Key design rules (post-refactor)
 
-| Rule | Where enforced |
-|------|---------------|
-| **Single responsibility** | Each `.rs` file contains one cohesive concept |
-| **No glob re-exports** | `lib.rs` only re-exports the explicit public API |
-| **Explicit imports** | All internal modules use full `crate::x::y` paths — no shortcut from crate root |
-| **No dead code** | Wrapper modules removed; duplicate functions eliminated |
-| **Presentation ≠ data** | `models/book.rs` (data) vs `models/display.rs` (tabled + i18n) |
-| **CLI concerns stay in `cli/`** | `EDITABLE_FIELDS` lives in `cli/fields.rs`, not `utils/` |
-| **DB migrations run once** | `start_db()` (`db/connection.rs`) runs migrations; `main.rs` does not repeat them |
+| Rule                            | Where enforced                                                                    |
+|---------------------------------|-----------------------------------------------------------------------------------|
+| **Single responsibility**       | Each `.rs` file contains one cohesive concept                                     |
+| **No glob re-exports**          | `lib.rs` only re-exports the explicit public API                                  |
+| **Explicit imports**            | All internal modules use full `crate::x::y` paths — no shortcut from crate root   |
+| **No dead code**                | Wrapper modules removed; duplicate functions eliminated                           |
+| **Presentation ≠ data**         | `models/book.rs` (data) vs `models/display.rs` (tabled + i18n)                    |
+| **CLI concerns stay in `cli/`** | `EDITABLE_FIELDS` lives in `cli/fields.rs`, not `utils/`                          |
+| **DB migrations run once**      | `start_db()` (`db/connection.rs`) runs migrations; `main.rs` does not repeat them |
 
 ---
 

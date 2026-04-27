@@ -23,44 +23,27 @@ and import/export support.
 
 ---
 
-### ✨ New in v0.5.1
+### ✨ New in v0.6.0
 
-**🗄️ Database management command**
+**🧱 Full internal refactor — cleaner module structure**
 
-A brand new `db` command has been introduced for complete database lifecycle control:
+This release performs a complete restructuring of the source tree without changing
+any user-visible behaviour (commands, flags, output remain identical).
 
-```bash
-librius db --init
-```
+Key improvements:
 
-Initializes or resets the current database.
+- `utils/` split into focused single-responsibility files: `verbose.rs`, `print.rs`,
+  `log.rs`, `import_helpers.rs`
+- `models/book.rs` (pure data) separated from `models/display.rs` (Tabled + i18n presentation)
+- `db/load_db.rs` → `db/connection.rs` · `db/migrate_db.rs` → `db/migrations.rs` ·
+  `db/search.rs` absorbed into `db/books.rs`
+- `cli/fields.rs` extracts `EDITABLE_FIELDS` from `utils/` where it did not belong
+- Dead code removed: `commands/add.rs` wrapper, duplicate `create_schema()`, dead `Commands` enum
+- `lib.rs` now exposes an explicit, minimal public API (no more glob re-exports)
+- Duplicate `run_migrations()` call in `main.rs` eliminated
+- Added [`STRUCTURE.md`](STRUCTURE.md) — full documented map of the source tree
 
-```bash
-librius db --reset
-```
-
-Alias of `--init`.
-
-```bash
-librius db --copy -f|--file <NEW_FILE>
-```
-
-Copies the database defined in your librius.yaml configuration to a new file.
-
-> The database path is automatically read from the database: key in the configuration file.
-
-**📚 Improved list details view**
-
-- Added the -`-compact` flag for list `--id <ID> --details` to hide empty fields in the vertical table.
-- The `--compact` flag now requires `--details`, ensuring consistent CLI behavior.
-- Fixed table headers that previously displayed `String`; now they correctly show localized Field / Value columns.
-- Field order in detailed view now matches the database schema (`id → added_at`).
-
-**🐞 Fixes & improvements**
-
-- Fixed `--copy` flag incorrectly requiring a value.
-- Improved integration between configuration and database operations.
-- Enhanced localized messages and help text for better clarity.
+> See [`CHANGELOG.md`](CHANGELOG.md) for the complete change log.
 
 ---
 
@@ -347,45 +330,53 @@ tr_with!("db.path.open_existing", & [("path", & db_path)]);
 
 ## 🧱 Project structure
 
+> Full details in [`STRUCTURE.md`](STRUCTURE.md).
+
 ```
 src/
-├─ main.rs
-├─ lib.rs
-├─ cli.rs
+├── main.rs             # binary entry-point
+├── lib.rs              # library root — explicit public API
 │
-├─ commands/
-│   ├─ mod.rs
-│   ├─ list.rs
-│   ├─ backup.rs
-│   ├─ config.rs
-│   ├─ export.rs
-│   └─ import.rs
+├── cli/
+│   ├── args.rs         # clap command tree (localised)
+│   ├── dispatch.rs     # subcommand → handler routing
+│   ├── fields.rs       # EDITABLE_FIELDS (CLI concern)
+│   └── mod.rs
 │
-├─ config/
-│   ├─ mod.rs
-│   ├─ load_config.rs
-│   └─ migrate_config.rs
+├── commands/           # one handle_* function per command
+│   ├── add_book.rs · backup.rs · config.rs · db.rs
+│   ├── del_book.rs · edit_book.rs · export.rs
+│   ├── import.rs · list.rs · search_book.rs
+│   └── mod.rs
 │
-├─ db/
-│   ├─ mod.rs
-│   ├─ load_db.rs
-│   └─ migrate_db.rs
+├── config/
+│   ├── load_config.rs  # AppConfig, YAML load/save
+│   ├── migrate_config.rs
+│   └── mod.rs
 │
-├─ i18n/
-│   ├─ mod.rs
-│   ├─ loader.rs
-│   └─ locales/
-│       ├─ en.json
-│       ├─ it.json
-│       └─ README.md
+├── db/
+│   ├── connection.rs   # open / init / ensure_schema
+│   ├── migrations.rs   # incremental patch system
+│   ├── books.rs        # CRUD + search_books
+│   └── mod.rs
 │
-├─ models/
-│   ├─ mod.rs
-│   └─ book.rs
+├── i18n/
+│   ├── loader.rs       # tr / tr_s / tr_with
+│   ├── mod.rs
+│   └── locales/        # en.json · it.json
 │
-└─ utils/
-    ├─ mod.rs
-    └─ table.rs
+├── models/
+│   ├── book.rs         # Book struct — pure data + Serde
+│   ├── display.rs      # BookFull / BookShort (Tabled + i18n)
+│   └── mod.rs
+│
+└── utils/
+    ├── verbose.rs      # set_verbose / is_verbose
+    ├── print.rs        # icons + print_ok/err/warn/info
+    ├── log.rs          # write_log / now_str
+    ├── import_helpers.rs
+    ├── isbn.rs · lang.rs · table.rs
+    └── mod.rs
 ```
 
 ---
@@ -490,16 +481,21 @@ language: "en"
 
 ## 🧩 Development notes
 
-Librius now follows a standard Rust modular structure:
+Librius follows a strict single-responsibility module structure:
 
-- Each domain (commands, db, config, models, utils, i18n) exposes its API via mod.rs.
-- Common utilities like build_table() are reused across commands for consistent output.
-- The lib.rs re-exports all major modules for cleaner imports in main.rs.
+- Each `.rs` file has one cohesive concern (data, display, log, print, …).
+- `lib.rs` exposes only an explicit, minimal public API — no wildcard re-exports.
+- Internal modules always use full `crate::x::y` paths; no implicit crate-root shortcuts.
+- DB migrations run exactly once, inside `db::connection::start_db()`.
 
-### Example import
+### Public API (lib.rs)
 
 ```rust
-use librius::{build_cli, handle_list, tr};
+use librius::config::AppConfig;
+use librius::db;
+use librius::commands::handle_list;
+use librius::utils::isbn::normalize_isbn;
+use librius::i18n::tr;
 ```
 
 ---
@@ -614,10 +610,9 @@ cargo clippy
 
 ## 🧱 Future roadmap
 
-- Add `add`, `remove`, and `search` commands
-- Export/import JSON and CSV
 - Add optional TUI (Text UI) with `ratatui`
 - Web dashboard sync
+- `docs.rs` full documentation coverage
 
 ---
 

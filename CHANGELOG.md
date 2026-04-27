@@ -2,6 +2,69 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-04-27
+
+### 🧱 Refactor — Complete modular restructuring
+
+This release introduces a full internal refactor of the codebase. No user-facing
+behaviour is changed; all commands, flags and output remain identical.
+
+#### `utils/` — monolith broken into focused submodules
+
+- **`utils/verbose.rs`** — `VERBOSE` static, `set_verbose()`, `is_verbose()`
+- **`utils/print.rs`** — `icons` module (`OK`/`ERR`/`WARN`/`INFO`) + `print_ok/err/warn/info()`
+- **`utils/log.rs`** — `now_str()`, `write_log()` (structured SQLite log entries)
+- **`utils/import_helpers.rs`** — `open_import_file()`, `handle_import_result()`
+- **`utils/mod.rs`** — aggregator with explicit `pub use` only (no more glob re-exports)
+
+#### `cli/` — CLI concerns separated from utilities
+
+- **`cli/fields.rs`** — `EDITABLE_FIELDS` moved from `utils/` (it is a CLI concern, not a generic utility)
+- **`cli/mod.rs`** — removed dead `Commands` enum (only 3 of 8 commands were represented, never used by dispatch)
+
+#### `models/` — data model separated from presentation
+
+- **`models/book.rs`** — pure data model: `Book` struct + `from_row()` + Serde only; no `tabled`/`i18n` dependencies
+- **`models/display.rs`** *(new)* — `BookFull`, `BookShort` with `Tabled` implementations and localised column headers
+
+#### `db/` — module consolidation and cleaner naming
+
+- **`db/load_db.rs` → `db/connection.rs`** — clearer name for DB connection management
+- **`db/migrate_db.rs` → `db/migrations.rs`** — clearer name for migration logic
+- **`db/search.rs`** — absorbed into `db/books.rs`; `search_books()` belongs with book operations
+
+#### `commands/` — removal of dead code and duplications
+
+- **`commands/add.rs`** removed — 18-line wrapper that only called `handle_add_book()` directly (dead code)
+- **`commands/list.rs`** — `row_to_book()` simplified to delegate to `Book::from_row()` + ISBN formatting only
+- **`commands/db.rs`** — local `create_schema()` duplicate removed; delegates to `db::connection::ensure_schema()`
+- **`commands/config.rs`** — `handle_config()` signature changed from `&Commands` enum to explicit bool parameters
+  `(init, print, edit, editor)`
+
+#### `lib.rs` — explicit public API
+
+- Removed all wildcard re-exports (`pub use commands::*`, `pub use utils::*`, etc.)
+- Replaced with an explicit, minimal public API:
+  ```rust
+  pub use config::{AppConfig, load_or_init};
+  pub use db::{init_db, start_db};
+  pub use models::Book;
+  pub use i18n::{load_language, tr, tr_s, tr_with};
+  ```
+- All internal modules now use full `crate::x::y` import paths
+
+#### `main.rs` — removed duplicate migration call
+
+- `run_migrations()` was called twice (once in `start_db()`, once explicitly in `main`).
+  Removed the redundant call in `main.rs`.
+
+### 📄 Documentation
+
+- Added **`STRUCTURE.md`** — complete map of every source file with its single responsibility,
+  design rules table, and the explicit public API surface.
+
+---
+
 ## [0.5.1] - 2025-11-12
 
 ### Added
