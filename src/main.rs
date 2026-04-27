@@ -64,7 +64,7 @@ fn main() {
     // ------------------------------------------------------------
     // 5️⃣ Esegue migrazioni DB e config
     // ------------------------------------------------------------
-    if let Err(e) = db::migrate_db::run_migrations(&conn) {
+    if let Err(e) = db::migrations::run_migrations(&conn) {
         print_err(&tr_with("db.migrate.failed", &[("error", &e.to_string())]));
     } else {
         print_ok(&tr("db.schema.verified"), is_verbose());

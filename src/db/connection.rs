@@ -1,5 +1,5 @@
 use crate::config::AppConfig;
-use crate::db::migrate_db;
+use crate::db::migrations;
 use crate::i18n::{tr, tr_with};
 use crate::utils::{is_verbose, print_err, print_info, print_ok, write_log};
 use rusqlite::{Connection, Result};
@@ -11,12 +11,12 @@ use std::path::PathBuf;
 /// Restituisce il percorso completo del file di database.
 ///
 /// La logica è:
-/// - Se esiste `LIBRIUS_DB_PATH` nelle variabili d’ambiente → usa quello.
-/// - Altrimenti crea (se necessario) la directory predefinita dell’app:
+/// - Se esiste `LIBRIUS_DB_PATH` nelle variabili d'ambiente → usa quello.
+/// - Altrimenti crea (se necessario) la directory predefinita dell'app:
 ///     - Linux/macOS: `~/.local/share/librius/librius.db`
 ///     - Windows: `%APPDATA%\\Librius\\librius.db`
 pub fn get_db_path() -> PathBuf {
-    // 1️⃣ Se definita, rispetta la variabile d’ambiente
+    // 1️⃣ Se definita, rispetta la variabile d'ambiente
     if let Ok(custom) = std::env::var("LIBRIUS_DB_PATH") {
         return PathBuf::from(custom);
     }
@@ -100,18 +100,18 @@ pub fn start_db(config: &AppConfig) -> Result<Connection> {
     }
 
     // 6️⃣ Esegui eventuali migrazioni
-    match migrate_db::run_migrations(&conn) {
+    match migrations::run_migrations(&conn) {
         Err(e) => {
             print_err(&tr_with("db.migrate.failed", &[("error", &e.to_string())]));
             let _ = write_log(&conn, "DB_MIGRATION_FAIL", "DB", &e.to_string());
         }
         Ok(result) => match result {
-            migrate_db::MigrationResult::Applied(patches) => {
+            migrations::MigrationResult::Applied(patches) => {
                 print_ok(&tr("db.migrate.applied"), is_verbose());
                 let msg = &tr_with("log.db.patch_applied", &[("patches", &patches.join(", "))]);
                 let _ = write_log(&conn, "DB_MIGRATION_OK", "DB", msg);
             }
-            migrate_db::MigrationResult::None => {
+            migrations::MigrationResult::None => {
                 print_ok(&tr("db.schema.already_update"), is_verbose());
             }
         },
@@ -149,3 +149,4 @@ pub fn ensure_schema(conn: &Connection) -> Result<()> {
     )?;
     Ok(())
 }
+
