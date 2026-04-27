@@ -1,7 +1,7 @@
 use crate::db::search_books;
 use crate::i18n::tr;
 use crate::models::{Book, BookFull, BookShort};
-use crate::print_warn;
+use crate::utils::print_warn;
 use crate::utils::table::build_table;
 use rusqlite::Connection;
 use std::error::Error;

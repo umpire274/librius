@@ -1,4 +1,4 @@
-use crate::tr_with;
+use crate::i18n::tr_with;
 use isbn2::{Isbn, IsbnError};
 use std::str::FromStr;
 
@@ -11,7 +11,7 @@ use std::str::FromStr;
 ///
 /// # Examples
 /// ```
-/// # use librius::isbn::normalize_isbn;
+/// # use librius::utils::isbn::normalize_isbn;
 ///
 /// let plain = normalize_isbn("978-88-203-8269-8", true).unwrap();
 /// assert_eq!(plain, "9788820382698");

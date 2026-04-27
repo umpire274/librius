@@ -3,7 +3,8 @@
 //! Provides a unified interface for rendering tabular data using the `tabled` crate,
 //! ensuring consistent visual style and alignment across commands.
 
-use crate::{print_warn, tr};
+use crate::i18n::tr;
+use crate::utils::print::print_warn;
 use serde::Serialize;
 use serde_json::Value;
 use tabled::settings::{Alignment, Modify, Style, object::Rows};

@@ -1,7 +1,8 @@
-use crate::cli::{Commands, build_cli};
-use crate::i18n::tr;
+use crate::cli::build_cli;
+use crate::commands::{handle_config, handle_edit_book, handle_list, handle_search};
+use crate::config::AppConfig;
+use crate::i18n::{tr, tr_with};
 use crate::utils::print_err;
-use crate::{AppConfig, handle_config, handle_edit_book, handle_list, handle_search, tr_with};
 use rusqlite::Connection;
 
 /// Dispatch principale dei comandi
@@ -31,13 +32,7 @@ pub fn run_cli(
         let edit = sub_m.get_flag("edit");
         let editor = sub_m.get_one::<String>("editor").cloned();
 
-        let cmd = Commands::Config {
-            init,
-            print,
-            edit,
-            editor,
-        };
-        Ok(handle_config(&cmd)?)
+        Ok(handle_config(init, print, edit, editor)?)
     } else if let Some(("db", sub_m)) = matches.subcommand() {
         let init = sub_m.get_flag("init");
         let reset = sub_m.get_flag("reset");

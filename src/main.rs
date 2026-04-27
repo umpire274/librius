@@ -62,14 +62,9 @@ fn main() {
         .unwrap_or_else(|_| panic!("{}", &tr_with("db.open.failed", &[("icon-err", ERR)])));
 
     // ------------------------------------------------------------
-    // 5️⃣ Esegue migrazioni DB e config
+    // 5️⃣ Esegue migrazioni config
     // ------------------------------------------------------------
-    if let Err(e) = db::migrate_db::run_migrations(&conn) {
-        print_err(&tr_with("db.migrate.failed", &[("error", &e.to_string())]));
-    } else {
-        print_ok(&tr("db.schema.verified"), is_verbose());
-    }
-
+    // Note: db migrations are already run by start_db() above.
     if let Err(e) = config::migrate_config(&conn, &config::config_file_path()) {
         print_err(&tr_with(
             "config.migrate.failed",

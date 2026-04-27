@@ -1,6 +1,6 @@
 use crate::i18n::tr_with;
-use crate::utils::{is_verbose, print_ok};
-use crate::{Book, print_err};
+use crate::models::Book;
+use crate::utils::{is_verbose, print_err, print_ok};
 use csv::ReaderBuilder;
 use rusqlite::Connection;
 use std::io::BufReader;

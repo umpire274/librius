@@ -1,8 +1,7 @@
-use crate::i18n::tr;
-use crate::isbn::normalize_isbn;
+use crate::i18n::{tr, tr_with};
 use crate::models::book::Book;
-use crate::utils::lang_code_to_name;
-use crate::{is_verbose, print_err, print_info, print_ok, print_warn, tr_with};
+use crate::utils::isbn::normalize_isbn;
+use crate::utils::{is_verbose, lang_code_to_name, print_err, print_info, print_ok, print_warn};
 use chrono::Utc;
 use reqwest::blocking::get;
 use rusqlite::{Connection, Error as RusqliteError, ErrorCode};
