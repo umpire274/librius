@@ -1,4 +1,5 @@
-use crate::book::{Book, BookFull, BookShort};
+use crate::models::book::Book;
+use crate::models::display::{BookFull, BookShort};
 use crate::i18n::tr;
 use crate::isbn::normalize_isbn;
 use crate::utils::{build_table, build_vertical_table, print_err};
