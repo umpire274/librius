@@ -149,4 +149,3 @@ pub fn ensure_schema(conn: &Connection) -> Result<()> {
     )?;
     Ok(())
 }
-

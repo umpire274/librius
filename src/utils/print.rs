@@ -42,4 +42,3 @@ pub fn print_info(msg: &str, verbose: bool) {
     }
     println!("{}{}", icons::INFO, msg.blue().bold());
 }
-

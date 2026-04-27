@@ -78,4 +78,3 @@ impl<'a> Tabled for BookShort<'a> {
         ]
     }
 }
-

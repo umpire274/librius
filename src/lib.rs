@@ -26,7 +26,7 @@ pub mod utils;
 // --- Explicit public API re-exports ---
 
 // Configuration
-pub use config::{load_or_init, AppConfig};
+pub use config::{AppConfig, load_or_init};
 
 // Database
 pub use db::{init_db, start_db};

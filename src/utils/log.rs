@@ -56,4 +56,3 @@ pub fn write_log(conn: &Connection, operation: &str, target: &str, message: &str
 
     Ok(())
 }
-

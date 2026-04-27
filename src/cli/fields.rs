@@ -23,4 +23,3 @@ pub const EDITABLE_FIELDS: &[(&str, &str, char)] = &[
     ("row", "help.edit.book.row", 'w'),
     ("position", "help.edit.book.position", 'o'),
 ];
-

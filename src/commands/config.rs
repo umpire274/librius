@@ -22,9 +22,7 @@ pub fn handle_config(
                     print_info(&tr("config.schema.list"), true);
                     println!("\n{}", contents);
                 }
-                Err(e) => {
-                    print_err(&tr_with("config.open.failed", &[("error", &e.to_string())]))
-                }
+                Err(e) => print_err(&tr_with("config.open.failed", &[("error", &e.to_string())])),
             }
         } else {
             print_warn(&tr("config.file.not_found"));

@@ -17,4 +17,3 @@ pub fn set_verbose(enabled: bool) {
 pub fn is_verbose() -> bool {
     *VERBOSE.get().unwrap_or(&false)
 }
-
