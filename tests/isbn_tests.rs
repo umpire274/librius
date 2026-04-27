@@ -1,4 +1,4 @@
-use librius::isbn::normalize_isbn;
+use librius::utils::isbn::normalize_isbn;
 
 #[test]
 fn test_plain_output() {

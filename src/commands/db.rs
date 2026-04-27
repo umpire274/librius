@@ -1,5 +1,7 @@
+use crate::config::AppConfig;
 use crate::db::connection::ensure_schema;
-use crate::{AppConfig, print_err, print_ok, print_warn, tr, tr_with};
+use crate::i18n::{tr, tr_with};
+use crate::utils::{print_err, print_ok, print_warn};
 use rusqlite::Connection;
 use std::error::Error;
 use std::fs;

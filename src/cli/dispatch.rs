@@ -1,7 +1,8 @@
 use crate::cli::build_cli;
-use crate::i18n::tr;
+use crate::commands::{handle_config, handle_edit_book, handle_list, handle_search};
+use crate::config::AppConfig;
+use crate::i18n::{tr, tr_with};
 use crate::utils::print_err;
-use crate::{AppConfig, handle_config, handle_edit_book, handle_list, handle_search, tr_with};
 use rusqlite::Connection;
 
 /// Dispatch principale dei comandi

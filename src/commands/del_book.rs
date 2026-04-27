@@ -1,4 +1,5 @@
-use crate::{print_err, print_info, print_ok, print_warn, tr_with, write_log};
+use crate::i18n::tr_with;
+use crate::utils::{print_err, print_info, print_ok, print_warn, write_log};
 use colored::*;
 use rusqlite::Connection;
 use std::io::{self, Write};
